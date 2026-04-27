@@ -140,10 +140,13 @@ Contoh:
 ## 🖼️ Screenshot Aplikasi
 
 Area Produksi:
-![Dashboard](img/Area.png)
+![Area](img/Area.png)
 
 Counter Mesin:
 ![Dashboard](img/Machine.png)
+
+Input Mesin:
+![New_Machine](img/mesin.png)
 
 MO Req:
 ![MO](img/mo.png)
