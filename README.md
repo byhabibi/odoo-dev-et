@@ -1,8 +1,6 @@
 # 🚀 IoT Monitoring System (Odoo + PLC Integration)
 
-IoT Monitoring adalah sistem integrasi antara mesin produksi (PLC) dengan Odoo untuk monitoring produksi secara real-time.
-
-Sistem ini menggunakan konsep Edge Gateway (Mini PC) untuk membaca data dari PLC, kemudian mengirimkannya ke Odoo.
+Development Apps IoT Monitoring Odoo
 
 ---
 
@@ -16,7 +14,7 @@ PLC → Gateway (Mini PC) → Buffer (SQLite) → Odoo
 
 IoT Monitoring/
 ├── iot_monitoring   # Odoo Module (UI & Monitoring)
-├── iot_gateway      # Gateway Python (PLC → Odoo)
+├── iot_gateway      # Gateway Python (PLC → Mini PC Gateway → Odoo)
 
 ---
 
@@ -24,15 +22,14 @@ IoT Monitoring/
 
 Module Odoo untuk:
 
-- Monitoring mesin (Kanban)
-- Menampilkan counter produksi
+- Counter mesin (Kanban)
 - Integrasi dengan Work Order (MRP)
 - Grafik Plan vs Actual
-- Status mesin (Running / Stop)
+- Status mesin (Running / Stop) sesuai Work Order
 
 ### 🔧 Install Module
 
-1. Tambahkan ke addons_path
+1. Clone folder iot_monitoring ke addons_custom
 2. Restart Odoo:
 
 odoo-bin -c odoo.conf -d db_odoo -u iot_monitoring
@@ -81,12 +78,6 @@ pip install -r requirements.txt
 ## ▶️ Menjalankan Gateway
 
 python main.py
-
----
-
-## 🖼️ Contoh Running Gateway
-
-![Gateway](iot_gateway/img/gateway_run.png)
 
 ---
 
@@ -146,7 +137,10 @@ Contoh:
 
 ## 🖼️ Screenshot Aplikasi
 
-Dashboard Mesin:
+Area Produksi:
+![Dashboard](iot_monitoring/img/dashboard.png)
+
+Counter Mesin:
 ![Dashboard](iot_monitoring/img/dashboard.png)
 
 Monitoring Graph:
