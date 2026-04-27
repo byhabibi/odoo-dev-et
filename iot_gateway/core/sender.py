@@ -8,7 +8,6 @@ API_KEY = "739a22bf1b86d6f893d45c99c7c0af8ed773c7f3"
 MACHINE_CODE = "NF03"
 # =======================
 
-
 common = xmlrpc.client.ServerProxy(f"{ODOO_URL}/xmlrpc/2/common")
 uid = common.authenticate(DB, USERNAME, API_KEY, {})
 
