@@ -1,9 +1,13 @@
 import xmlrpc.client
 
+# ===== KONFIGURASI =====
 ODOO_URL = "http://localhost:8069"
 DB = "db_odoo"
 USERNAME = "admin"
-API_KEY = "isi_api_key_lu"
+API_KEY = "739a22bf1b86d6f893d45c99c7c0af8ed773c7f3"
+MACHINE_CODE = "NF03"
+# =======================
+
 
 common = xmlrpc.client.ServerProxy(f"{ODOO_URL}/xmlrpc/2/common")
 uid = common.authenticate(DB, USERNAME, API_KEY, {})
