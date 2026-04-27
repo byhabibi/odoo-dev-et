@@ -138,13 +138,13 @@ Contoh:
 ## 🖼️ Screenshot Aplikasi
 
 Area Produksi:
-![Dashboard](iot_monitoring/img/dashboard.png)
+![Dashboard](img/Area.png)
 
 Counter Mesin:
-![Dashboard](iot_monitoring/img/dashboard.png)
+![Dashboard](img/Machine.png)
 
 Monitoring Graph:
-![Graph](iot_monitoring/img/graph.png)
+![Graph](img/graph.png)
 
 ---
 
