@@ -52,7 +52,7 @@ def main():
 
     init_db()
 
-    with open("config/machines.json") as f:
+    with open("config/ip_list_machine.json") as f:
         machines = json.load(f)
 
     print(f"[INFO] Loaded {len(machines)} machines")
