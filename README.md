@@ -75,6 +75,8 @@ pip install -r requirements.txt
 
 ---
 
+![Env](img/env.png)
+
 ## ▶️ Menjalankan Gateway
 
 python main.py
@@ -142,6 +144,9 @@ Area Produksi:
 
 Counter Mesin:
 ![Dashboard](img/Machine.png)
+
+MO Req:
+![MO](img/mo.png)
 
 Monitoring Graph:
 ![Graph](img/graph.png)
