@@ -26,10 +26,10 @@ class IoTSensorData(models.Model):
         if not machine:
             return {'success': False, 'error': f'Machine not found: {machine_code_clean}'}
 
-        # Sync WO — reset counter kalau WO berubah
+        # Sync WO dulu
         machine._sync_workorder()
 
-        # Ambil WO aktif + plan qty
+        # Ambil WO aktif setelah sync
         product_name = '-'
         plan_qty = 0
         workorder = False
@@ -43,15 +43,17 @@ class IoTSensorData(models.Model):
                 product_name = workorder.product_id.name or '-'
                 plan_qty = workorder.production_id.product_qty or 0
 
-        # Counter langsung dari PLC (nilai absolut)
-        # Kalau PLC reset (counter < machine.counter dan counter kecil)
-        last_counter = machine.counter or 0
-        if counter < last_counter and counter < 10:
-            # PLC reset — mulai dari nilai baru
+        # Reload machine dari DB setelah sync
+        machine.refresh()
+
+        # Hitung counter relatif dari WO ini pakai offset
+        plc_offset = machine.plc_offset or 0
+        new_counter = counter - plc_offset
+
+        # Kalau negatif berarti PLC sudah reset
+        if new_counter < 0:
             new_counter = counter
-        else:
-            # Pakai nilai PLC langsung
-            new_counter = counter
+            machine.write({'plc_offset': 0})
 
         # Simpan log
         self.create({
@@ -73,7 +75,6 @@ class IoTSensorData(models.Model):
             try:
                 workorder.write({'qty_produced': plan_qty})
                 workorder.button_finish()
-                # Reset counter setelah WO done
                 machine.write({'counter': 0})
                 return {'success': True, 'info': 'WO completed, counter reset'}
             except Exception as e:

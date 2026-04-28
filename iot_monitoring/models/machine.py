@@ -10,6 +10,7 @@ class IoTMachine(models.Model):
     workcenter_id = fields.Many2one('mrp.workcenter', string='Work Center')
     sensor_data_ids = fields.One2many('iot.sensor.data', 'machine_id')
     code = fields.Char(string='Machine Code')
+    plc_offset = fields.Integer(default=0, store=True)
 
     # Core
     current_workorder_id = fields.Many2one('mrp.workorder')
@@ -58,14 +59,17 @@ class IoTMachine(models.Model):
                 machine.current_product = '-'
 
     def _sync_workorder(self):
-        """Dipanggil dari sensor saat data masuk"""
         for machine in self:
             wo = machine._get_active_workorder()
-            if wo and wo.id != machine.current_workorder_id.id:
-                # WO baru → reset counter
+            current_wo_id = machine.current_workorder_id.id if machine.current_workorder_id else False
+            new_wo_id = wo.id if wo else False
+            
+            if new_wo_id != current_wo_id:
+                # Simpan nilai PLC terakhir sebagai offset
                 machine.write({
-                    'current_workorder_id': wo.id,
+                    'current_workorder_id': new_wo_id,
                     'counter': 0,
+                    'plc_offset': machine.counter,  # simpan posisi PLC terakhir
                     'latest_timestamp': fields.Datetime.now(),
                 })
 
