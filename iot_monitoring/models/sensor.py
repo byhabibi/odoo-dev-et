@@ -56,6 +56,7 @@ class IoTSensorData(models.Model):
         # =========================
         # 🔥 UPDATE MACHINE COUNTER
         # =========================
+        machine._sync_workorder()
         if delta > 0:
             machine.update_counter(delta)
 

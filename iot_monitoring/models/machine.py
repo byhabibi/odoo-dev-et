@@ -28,27 +28,17 @@ class IoTMachine(models.Model):
     def _get_active_workorder(self):
         self.ensure_one()
 
-        mo = self.env['mrp.workorder'].search([
-            ('workcenter_id', '=', self.workcenter_id.id),
-            ('state', '=', 'progress'),
+        mo = self.env['mrp.production'].search([
+            ('state', '=', 'progress')
         ], order='id desc', limit=1)
 
-        """
-        mo = self.env['mrp.production'].search([
-            ('state', '=', 'progress'),
-            ('product_id', '!=', False),
-        ], order='date_start desc', limit=1)
         if not mo:
-            return False
-        """
-        
-        if wo:
             return False
         
         wo = self.env['mrp.workorder'].search([
             ('production_id', '=', mo.id),
             ('workcenter_id', '=', self.workcenter_id.id),
-        ], order='id desc', limit=1)
+        ], limit=1)
 
         return wo
 
@@ -104,7 +94,7 @@ class IoTMachine(models.Model):
         for machine in self:
             wo = machine._get_active_workorder()
 
-            if wo != machine.current_workorder_id:
+            if wo and wo != machine.current_workorder_id:
                 machine.current_workorder_id = wo
                 machine.counter = 0
 
