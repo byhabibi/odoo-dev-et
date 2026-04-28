@@ -63,13 +63,13 @@ class IoTMachine(models.Model):
             wo = machine._get_active_workorder()
             current_wo_id = machine.current_workorder_id.id if machine.current_workorder_id else False
             new_wo_id = wo.id if wo else False
-            
+
             if new_wo_id != current_wo_id:
-                # Simpan nilai PLC terakhir sebagai offset
+                # WO berubah atau selesai → reset counter
                 machine.write({
                     'current_workorder_id': new_wo_id,
                     'counter': 0,
-                    'plc_offset': machine.counter,  # simpan posisi PLC terakhir
+                    'plc_offset': machine.counter,
                     'latest_timestamp': fields.Datetime.now(),
                 })
 
@@ -98,6 +98,23 @@ class IoTMachine(models.Model):
             'context': {'default_machine_id': self.id},
             'target': 'current',
         }
+    
+    @api.model
+    def _cron_sync_all_workorders(self):
+        """Safety net — dipanggil cron tiap 1 menit"""
+        machines = self.search([])
+        for machine in machines:
+            wo = machine._get_active_workorder()
+            current_wo_id = machine.current_workorder_id.id if machine.current_workorder_id else False
+            new_wo_id = wo.id if wo else False
+
+            if new_wo_id != current_wo_id:
+                machine.write({
+                    'current_workorder_id': new_wo_id,
+                    'counter': 0,
+                    'plc_offset': machine.counter,
+                    'latest_timestamp': fields.Datetime.now(),
+                })
 
     @api.model
     def create(self, vals):

@@ -6,7 +6,7 @@
     'depends': ['base', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
-        #'data/data_area.xml',
+        'data/cron.xml',
         #'data/data_machine.xml',
         'views/view_area.xml',
         'views/view_machine.xml',
