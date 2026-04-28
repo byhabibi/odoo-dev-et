@@ -22,7 +22,6 @@ def send_data(counter):
     )
 
 def reset_counter():
-    # Cari machine by name
     machines = models.execute_kw(
         DB, uid, API_KEY,
         'iot.machine', 'search_read',
@@ -32,27 +31,21 @@ def reset_counter():
     if not machines:
         print(f"Machine {MACHINE_CODE} tidak ditemukan!")
         return False
-    
     machine_id = machines[0]['id']
-    print(f"Machine ditemukan: {machines[0]['name']} (id={machine_id})")
-    
-    models.execute_kw(
-        DB, uid, API_KEY,
-        'iot.machine', 'write',
-        [[machine_id], {'counter': 0}]
-    )
+    print(f"Machine: {machines[0]['name']} (id={machine_id})")
+    models.execute_kw(DB, uid, API_KEY, 'iot.machine', 'write',
+        [[machine_id], {'counter': 0}])
     return True
 
-# Reset counter dulu
+# Reset dulu
 print("Reset counter...")
-if not reset_counter():
-    exit()
-time.sleep(0.5)
+reset_counter()
+time.sleep(1)
 
-# Kirim dengan step besar
-print(f"Kirim data ke {MACHINE_CODE} step={STEP}...")
+# Phase 1 — kirim sampai 1000
+print(f"\nPhase 1: Kirim data ke {MACHINE_CODE} sampai 1000...")
 counter = 0
-while counter < 10000:
+while counter < 1000:
     counter += STEP
     result = send_data(counter)
     print(f"Counter {counter} → {result}")
@@ -61,4 +54,25 @@ while counter < 10000:
         print("✅ WO DONE!")
         break
 
-print("Done!")
+print(f"\n⏸ Gateway DIAM 5 menit... (simulate mesin stop)")
+print("Selama ini selesaikan MO → buat backorder → START backorder")
+print("Setelah 1 menit, counter harusnya reset ke 0 otomatis oleh cron")
+
+# Diam 5 menit
+for i in range(3, 0, -1):
+    print(f"  Sisa {i} menit...")
+    time.sleep(60)
+
+# Phase 2 — gateway aktif lagi, counter lanjut dari 1000
+print(f"\nPhase 2: Gateway aktif lagi...")
+print("Counter harusnya mulai dari 0 (karena offset sudah diset saat WO berubah)")
+while counter < 2000:
+    counter += STEP
+    result = send_data(counter)
+    print(f"PLC Counter {counter} → Odoo Counter: {result.get('counter', '?')} | {result}")
+
+    if isinstance(result, dict) and result.get('info') == 'WO completed, counter reset':
+        print("✅ WO DONE!")
+        break
+
+print("\nDone!")

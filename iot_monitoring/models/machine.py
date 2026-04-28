@@ -65,11 +65,17 @@ class IoTMachine(models.Model):
             new_wo_id = wo.id if wo else False
 
             if new_wo_id != current_wo_id:
-                # WO berubah atau selesai → reset counter
+                # Ambil nilai PLC terakhir dari sensor log
+                last_sensor = self.env['iot.sensor.data'].search([
+                    ('machine_id', '=', machine.id)
+                ], limit=1, order='timestamp desc')
+                
+                last_plc_value = last_sensor.counter if last_sensor else 0
+
                 machine.write({
                     'current_workorder_id': new_wo_id,
                     'counter': 0,
-                    'plc_offset': machine.counter,
+                    'plc_offset': last_plc_value,  # ← nilai PLC absolut terakhir
                     'latest_timestamp': fields.Datetime.now(),
                 })
 
@@ -101,7 +107,6 @@ class IoTMachine(models.Model):
     
     @api.model
     def _cron_sync_all_workorders(self):
-        """Safety net — dipanggil cron tiap 1 menit"""
         machines = self.search([])
         for machine in machines:
             wo = machine._get_active_workorder()
@@ -109,10 +114,17 @@ class IoTMachine(models.Model):
             new_wo_id = wo.id if wo else False
 
             if new_wo_id != current_wo_id:
+                # Ambil nilai PLC terakhir dari sensor log
+                last_sensor = self.env['iot.sensor.data'].search([
+                    ('machine_id', '=', machine.id)
+                ], limit=1, order='timestamp desc')
+                
+                last_plc_value = last_sensor.counter if last_sensor else 0
+
                 machine.write({
                     'current_workorder_id': new_wo_id,
                     'counter': 0,
-                    'plc_offset': machine.counter,
+                    'plc_offset': last_plc_value,  # ← nilai PLC absolut terakhir
                     'latest_timestamp': fields.Datetime.now(),
                 })
 
