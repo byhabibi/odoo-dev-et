@@ -28,17 +28,13 @@ class IoTMachine(models.Model):
     def _get_active_workorder(self):
         self.ensure_one()
 
-        mo = self.env['mrp.production'].search([
-            ('state', '=', 'progress')
-        ], order='id desc', limit=1)
-
-        if not mo:
+        if not self.workcenter_id:
             return False
-        
+
         wo = self.env['mrp.workorder'].search([
-            ('production_id', '=', mo.id),
             ('workcenter_id', '=', self.workcenter_id.id),
-        ], limit=1)
+            ('state', '=', 'progress'),
+        ], order='date_start desc', limit=1)
 
         return wo
 
@@ -97,5 +93,31 @@ class IoTMachine(models.Model):
             if wo and wo != machine.current_workorder_id:
                 machine.current_workorder_id = wo
                 machine.counter = 0
+    
 
+    def action_open_workorders(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Work Orders - ' + self.name,
+            'res_model': 'mrp.workorder',
+            'view_mode': 'kanban,list,form',
+            'domain': [
+                ('workcenter_id', '=', self.workcenter_id.id),
+                ('state', 'in', ['ready', 'progress']),
+            ],
+            'target': 'new',
+        }
+    
+    def action_open_monitoring(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Monitoring - ' + self.name,
+            'res_model': 'iot.production.summary',
+            'view_mode': 'graph',
+            'domain': [('machine_id', '=', self.id)],
+            'context': {'default_machine_id': self.id},
+            'target': 'current',
+        }
 
