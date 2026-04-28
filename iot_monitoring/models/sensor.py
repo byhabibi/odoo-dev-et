@@ -16,52 +16,41 @@ class IoTSensorData(models.Model):
     timestamp = fields.Datetime(required=True)
     product_name = fields.Char()
 
-    # =========================
-    # 🔥 CORE RECEIVE DATA
-    # =========================
     @api.model
     def receive_data(self, machine_code, status, counter, timestamp):
 
+        # 🔍 Cari mesin
         machine = self.env['iot.machine'].search([
-            ('workcenter_id.name', '=', machine_code)
+            ('name', 'ilike', machine_code),
+            ('code', '=', machine_code)
         ], limit=1)
 
         if not machine:
             return {'success': False, 'error': 'Machine not found'}
 
-        # =========================
-        # 🔥 GET CURRENT WO
-        # =========================
+        # 🔥 Sync WO
+        if hasattr(machine, '_sync_workorder'):
+            machine._sync_workorder()
+
+        # 🔍 Ambil WO aktif
         wo = machine._get_active_workorder()
 
-        product_name = '-'
-        if wo:
-            product_name = wo.product_id.name or '-'
+        product_name = wo.product_id.name if wo else '-'
 
         # =========================
-        # 🔥 HITUNG DELTA (ANTI NUMPUK)
+        # 🔥 DELTA DARI MACHINE (LEBIH STABIL)
         # =========================
-        last_data = self.search([
-            ('machine_id', '=', machine.id)
-        ], order='timestamp desc', limit=1)
-
-        last_counter = last_data.counter if last_data else 0
-
+        last_counter = machine.counter or 0
         delta = counter - last_counter
 
-        # 🔥 HANDLE RESET PLC
+        print(f"[DEBUG] IN={counter} | MACHINE={last_counter} | DELTA={delta}")
+
+        # 🔁 Handle reset PLC
         if delta < 0:
             delta = counter
 
         # =========================
-        # 🔥 UPDATE MACHINE COUNTER
-        # =========================
-        machine._sync_workorder()
-        if delta > 0:
-            machine.update_counter(delta)
-
-        # =========================
-        # 🔥 SAVE LOG (RAW DATA)
+        # 🔥 SAVE LOG DULU
         # =========================
         self.create({
             'machine_id': machine.id,
@@ -70,5 +59,13 @@ class IoTSensorData(models.Model):
             'timestamp': timestamp,
             'product_name': product_name,
         })
+
+        # =========================
+        # 🔥 UPDATE COUNTER (PASTI NAIK)
+        # =========================
+        if delta > 0:
+            machine.write({
+                'counter': machine.counter + delta
+            })
 
         return {'success': True}

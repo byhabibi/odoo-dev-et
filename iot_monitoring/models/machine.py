@@ -10,6 +10,7 @@ class IoTMachine(models.Model):
     workcenter_id = fields.Many2one('mrp.workcenter', string='Work Center')
 
     sensor_data_ids = fields.One2many('iot.sensor.data', 'machine_id')
+    code = fields.Char(string='Machine Code')
 
     # 🔥 CORE
     current_workorder_id = fields.Many2one('mrp.workorder')
@@ -120,4 +121,6 @@ class IoTMachine(models.Model):
             'context': {'default_machine_id': self.id},
             'target': 'current',
         }
+    
+    
 

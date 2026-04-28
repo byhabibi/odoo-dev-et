@@ -6,7 +6,7 @@ ODOO_URL = "http://localhost:8069"
 DB = "db_odoo"
 USERNAME = "admin"
 API_KEY = "739a22bf1b86d6f893d45c99c7c0af8ed773c7f3"
-MACHINE_CODE = "NF03"
+MACHINE_CODE = "NF 03"
 # =======================
 
 # Koneksi XML-RPC
@@ -27,9 +27,11 @@ def send_data(machine_code, status, counter):
     return result
 
 # Test kirim data
+counter = 0
+
 print(f"\nKirim data ke mesin {MACHINE_CODE}...")
 for i in range(1, 51):
-    counter = 1
+    counter += 1
     result = send_data(MACHINE_CODE, "progress", counter)
     print(f"Counter {counter} pcs → {result}")
 
