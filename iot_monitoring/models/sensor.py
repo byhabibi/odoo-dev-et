@@ -11,17 +11,14 @@ class IoTSensorData(models.Model):
         ('progress', 'In Progress'),
         ('stop', 'Stop Line'),
     ], required=True)
-
     counter = fields.Integer()
     timestamp = fields.Datetime(required=True)
     product_name = fields.Char()
 
     @api.model
     def receive_data(self, machine_code, status, counter, timestamp):
-        
+
         machine_code_clean = (machine_code or "").strip()
-        
-        # Search pakai ilike biar case-insensitive
         machine = self.env['iot.machine'].search([
             ('name', 'ilike', machine_code_clean)
         ], limit=1)
@@ -29,8 +26,14 @@ class IoTSensorData(models.Model):
         if not machine:
             return {'success': False, 'error': f'Machine not found: {machine_code_clean}'}
 
-        # Ambil product dari workorder aktif
+        # Sync WO — reset counter kalau WO berubah
+        machine._sync_workorder()
+
+        # Ambil WO aktif + plan qty
         product_name = '-'
+        plan_qty = 0
+        workorder = False
+
         if machine.workcenter_id:
             workorder = self.env['mrp.workorder'].search([
                 ('workcenter_id', '=', machine.workcenter_id.id),
@@ -38,13 +41,42 @@ class IoTSensorData(models.Model):
             ], limit=1)
             if workorder:
                 product_name = workorder.product_id.name or '-'
+                plan_qty = workorder.production_id.product_qty or 0
 
+        # Counter langsung dari PLC (nilai absolut)
+        # Kalau PLC reset (counter < machine.counter dan counter kecil)
+        last_counter = machine.counter or 0
+        if counter < last_counter and counter < 10:
+            # PLC reset — mulai dari nilai baru
+            new_counter = counter
+        else:
+            # Pakai nilai PLC langsung
+            new_counter = counter
+
+        # Simpan log
         self.create({
             'machine_id': machine.id,
             'status': status,
-            'counter': counter,
+            'counter': new_counter,
             'timestamp': timestamp,
             'product_name': product_name,
         })
 
-        return {'success': True}
+        # Update counter di mesin
+        machine.write({
+            'counter': new_counter,
+            'latest_timestamp': timestamp,
+        })
+
+        # Cek apakah sudah capai plan → mark WO as done
+        if plan_qty > 0 and new_counter >= plan_qty and workorder:
+            try:
+                workorder.write({'qty_produced': plan_qty})
+                workorder.button_finish()
+                # Reset counter setelah WO done
+                machine.write({'counter': 0})
+                return {'success': True, 'info': 'WO completed, counter reset'}
+            except Exception as e:
+                return {'success': True, 'warning': f'Counter ok tapi gagal finish WO: {str(e)}'}
+
+        return {'success': True, 'counter': new_counter, 'plan': plan_qty}
