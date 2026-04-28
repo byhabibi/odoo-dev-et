@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 
+
 class IoTMachine(models.Model):
     _name = 'iot.machine'
     _description = 'IoT Machine'
@@ -8,48 +9,52 @@ class IoTMachine(models.Model):
     area_id = fields.Many2one('iot.area', string='Area')
     workcenter_id = fields.Many2one('mrp.workcenter', string='Work Center')
 
-    # 🔗 RELASI
-    sensor_data_ids = fields.One2many('iot.sensor.data', 'machine_id', string='Sensor Data')
+    sensor_data_ids = fields.One2many('iot.sensor.data', 'machine_id')
 
-    # 🔥 CORE SYSTEM
-    current_workorder_id = fields.Many2one(
-        'mrp.workorder',
-        string='Current Work Order'
-    )
+    # 🔥 CORE
+    current_workorder_id = fields.Many2one('mrp.workorder')
+    counter = fields.Integer(default=0)
 
-    counter = fields.Integer(
-        string='Actual Counter',
-        default=0
-    )
+    # 🔥 UI
+    production_status = fields.Char(compute='_compute_production_status')
+    current_product = fields.Char(compute='_compute_production_status')
 
-    # 🎯 UI (Joko UI)
-    production_status = fields.Char(
-        string='Status',
-        compute='_compute_production_status'
-    )
-
-    current_product = fields.Char(
-        string='Product',
-        compute='_compute_production_status'
-    )
-
-    latest_counter = fields.Integer(
-        string='Counter Terkini',
-        compute='_compute_latest_sensor'
-    )
-
-    latest_timestamp = fields.Datetime(
-        string='Update Terakhir',
-        compute='_compute_latest_sensor'
-    )
+    latest_counter = fields.Integer(compute='_compute_latest_sensor')
+    latest_timestamp = fields.Datetime(compute='_compute_latest_sensor')
 
     # =========================
-    # 🔥 Status Cok
+    # 🔥 AUTO DETECT WO (REALTIME)
     # =========================
-    @api.depends('current_workorder_id')
+    def _get_active_workorder(self):
+        self.ensure_one()
+
+        wo = self.env['mrp.workorder'].search([
+            ('workcenter_id', '=', self.workcenter_id.id),
+            ('state', '=', 'progress'),
+        ], order='date_start desc, id desc', limit=1)
+        
+        if wo:
+            return wo
+        
+        wo = self.env['mrp.workorder'].search([
+            ('workcenter_id', '=', self.workcenter_id.id),
+            ('state', '=', 'ready'),
+        ], order='id desc', limit=1)
+
+        return wo
+
+    # =========================
+    # 🔥 STATUS + PRODUCT
+    # =========================
+    @api.depends()
     def _compute_production_status(self):
         for machine in self:
-            wo = machine.current_workorder_id
+            wo = machine._get_active_workorder()
+
+            # 🔥 AUTO SYNC WO
+            if wo != machine.current_workorder_id:
+                machine.current_workorder_id = wo
+                machine.counter = 0  # RESET
 
             if wo and wo.state == 'progress':
                 machine.production_status = 'progress'
@@ -57,9 +62,11 @@ class IoTMachine(models.Model):
             else:
                 machine.production_status = 'stop'
                 machine.current_product = '-'
+        
+        print("WO DETECTED:", wo.name if wo else "NONE")
 
     # =========================
-    # 🔥 Counter Angzay
+    # 🔥 COUNTER DISPLAY
     # =========================
     @api.depends('counter')
     def _compute_latest_sensor(self):
@@ -73,53 +80,23 @@ class IoTMachine(models.Model):
             machine.latest_timestamp = latest.timestamp if latest else False
 
     # =========================
-    # 🔄 SET WORKORDER + RESET
+    # 🔥 DIPANGGIL DARI SENSOR
     # =========================
-    def set_workorder(self, workorder):
+    def update_counter(self, delta):
         for machine in self:
-            if machine.current_workorder_id != workorder:
-                machine.current_workorder_id = workorder
-                machine.counter = 0
+            machine._sync_workorder()
+
+            machine.counter += delta
 
     # =========================
-    # 🤖 AUTO DETECT WO (Kali bisa wkwk)
+    # 🔄 SYNC WO MANUAL (dipakai gateway)
     # =========================
-    def auto_update_workorder(self):
+    def _sync_workorder(self):
         for machine in self:
-            wo = self.env['mrp.workorder'].search([
-                ('workcenter_id', '=', machine.workcenter_id.id),
-                ('state', '=', 'progress'),
-            ], limit=1)
+            wo = machine._get_active_workorder()
 
             if wo != machine.current_workorder_id:
                 machine.current_workorder_id = wo
                 machine.counter = 0
 
-    # =========================
-    # 🔗 ACTION UI
-    # =========================
-    def action_open_workorders(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Work Orders - ' + self.name,
-            'res_model': 'mrp.workorder',
-            'view_mode': 'kanban,list,form',
-            'domain': [
-                ('workcenter_id', '=', self.workcenter_id.id),
-                ('state', 'in', ['ready', 'progress']),
-            ],
-            'target': 'new',
-        }
 
-    def action_open_monitoring(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Monitoring - ' + self.name,
-            'res_model': 'iot.production.summary',
-            'view_mode': 'graph',
-            'domain': [('machine_id', '=', self.id)],
-            'context': {'default_machine_id': self.id},
-            'target': 'current',
-        }

@@ -1,58 +1,73 @@
 from odoo import models, fields, api
 
+
 class IoTSensorData(models.Model):
     _name = 'iot.sensor.data'
     _description = 'IoT Sensor Data'
     _order = 'timestamp desc'
 
-    machine_id = fields.Many2one('iot.machine', string='Mesin', required=True)
+    machine_id = fields.Many2one('iot.machine', required=True)
     status = fields.Selection([
         ('progress', 'In Progress'),
         ('stop', 'Stop Line'),
-    ], string='Status', required=True)
-    counter = fields.Integer(string='Counter (pcs)')
-    timestamp = fields.Datetime(string='Timestamp', required=True)
-    product_name = fields.Char(string='Product', store=True)
+    ], required=True)
 
+    counter = fields.Integer()
+    timestamp = fields.Datetime(required=True)
+    product_name = fields.Char()
+
+    # =========================
+    # 🔥 CORE RECEIVE DATA
+    # =========================
     @api.model
     def receive_data(self, machine_code, status, counter, timestamp):
+
         machine = self.env['iot.machine'].search([
             ('workcenter_id.name', '=', machine_code)
         ], limit=1)
 
         if not machine:
-            return {'success': False, 'error': 'Machine not found: ' + machine_code}
-
-        # 🔥 Kita ambil work order yang aktif aja gess
-        workorder = self.env['mrp.workorder'].search([
-            ('workcenter_id', '=', machine.workcenter_id.id),
-            ('state', '=', 'progress'),
-        ], limit=1)
-
-        product_name = workorder.product_id.name if workorder else '-'
+            return {'success': False, 'error': 'Machine not found'}
 
         # =========================
-        # 🔥 AUTO SET WO + RESET
+        # 🔥 GET CURRENT WO
         # =========================
-        if workorder and machine.current_workorder_id != workorder:
-            machine.current_workorder_id = workorder
-            machine.counter = 0
+        wo = machine._get_active_workorder()
+
+        product_name = '-'
+        if wo:
+            product_name = wo.product_id.name or '-'
 
         # =========================
-        # ✅ (gob)Log sensor data
+        # 🔥 HITUNG DELTA (ANTI NUMPUK)
+        # =========================
+        last_data = self.search([
+            ('machine_id', '=', machine.id)
+        ], order='timestamp desc', limit=1)
+
+        last_counter = last_data.counter if last_data else 0
+
+        delta = counter - last_counter
+
+        # 🔥 HANDLE RESET PLC
+        if delta < 0:
+            delta = counter
+
+        # =========================
+        # 🔥 UPDATE MACHINE COUNTER
+        # =========================
+        if delta > 0:
+            machine.update_counter(delta)
+
+        # =========================
+        # 🔥 SAVE LOG (RAW DATA)
         # =========================
         self.create({
             'machine_id': machine.id,
             'status': status,
             'counter': counter,
-            'timestamp': fields.Datetime.now(),  # 🔥 pakai ini
+            'timestamp': timestamp,
             'product_name': product_name,
         })
-
-        # =========================
-        # 🔥 Counter
-        # =========================
-        if workorder:
-            machine.counter += counter
 
         return {'success': True}
