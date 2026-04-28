@@ -6,7 +6,7 @@ ODOO_URL = "http://localhost:8069"
 DB = "db_odoo"
 USERNAME = "admin"
 API_KEY = "739a22bf1b86d6f893d45c99c7c0af8ed773c7f3"
-MACHINE_CODE = "NF 03"
+MACHINE_CODE = "NF03"
 # =======================
 
 # Koneksi XML-RPC
