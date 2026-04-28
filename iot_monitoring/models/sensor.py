@@ -18,40 +18,27 @@ class IoTSensorData(models.Model):
 
     @api.model
     def receive_data(self, machine_code, status, counter, timestamp):
-
-        # 🔍 Cari mesin
+        
+        machine_code_clean = (machine_code or "").strip()
+        
+        # Search pakai ilike biar case-insensitive
         machine = self.env['iot.machine'].search([
-            ('name', 'ilike', machine_code),
-            ('code', '=', machine_code)
+            ('name', 'ilike', machine_code_clean)
         ], limit=1)
 
         if not machine:
-            return {'success': False, 'error': 'Machine not found'}
+            return {'success': False, 'error': f'Machine not found: {machine_code_clean}'}
 
-        # 🔥 Sync WO
-        if hasattr(machine, '_sync_workorder'):
-            machine._sync_workorder()
+        # Ambil product dari workorder aktif
+        product_name = '-'
+        if machine.workcenter_id:
+            workorder = self.env['mrp.workorder'].search([
+                ('workcenter_id', '=', machine.workcenter_id.id),
+                ('state', '=', 'progress'),
+            ], limit=1)
+            if workorder:
+                product_name = workorder.product_id.name or '-'
 
-        # 🔍 Ambil WO aktif
-        wo = machine._get_active_workorder()
-
-        product_name = wo.product_id.name if wo else '-'
-
-        # =========================
-        # 🔥 DELTA DARI MACHINE (LEBIH STABIL)
-        # =========================
-        last_counter = machine.counter or 0
-        delta = counter - last_counter
-
-        print(f"[DEBUG] IN={counter} | MACHINE={last_counter} | DELTA={delta}")
-
-        # 🔁 Handle reset PLC
-        if delta < 0:
-            delta = counter
-
-        # =========================
-        # 🔥 SAVE LOG DULU
-        # =========================
         self.create({
             'machine_id': machine.id,
             'status': status,
@@ -59,13 +46,5 @@ class IoTSensorData(models.Model):
             'timestamp': timestamp,
             'product_name': product_name,
         })
-
-        # =========================
-        # 🔥 UPDATE COUNTER (PASTI NAIK)
-        # =========================
-        if delta > 0:
-            machine.write({
-                'counter': machine.counter + delta
-            })
 
         return {'success': True}

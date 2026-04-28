@@ -64,16 +64,18 @@ class IoTMachine(models.Model):
     # =========================
     # 🔥 COUNTER DISPLAY
     # =========================
-    @api.depends('counter')
+    @api.depends('sensor_data_ids', 'sensor_data_ids.counter', 'sensor_data_ids.timestamp')
     def _compute_latest_sensor(self):
         for machine in self:
-            machine.latest_counter = machine.counter
-
             latest = self.env['iot.sensor.data'].search([
                 ('machine_id', '=', machine.id)
-            ], order='timestamp desc', limit=1)
-
-            machine.latest_timestamp = latest.timestamp if latest else False
+            ], limit=1, order='timestamp desc')
+            if latest:
+                machine.latest_counter = latest.counter
+                machine.latest_timestamp = latest.timestamp
+            else:
+                machine.latest_counter = 0
+                machine.latest_timestamp = False
 
     # =========================
     # 🔥 DIPANGGIL DARI SENSOR
@@ -122,5 +124,15 @@ class IoTMachine(models.Model):
             'target': 'current',
         }
     
-    
+    @api.model
+    def create(self, vals):
+        if not vals.get('code') and vals.get('name'):
+            vals['code'] = vals['name'].replace(" ", "").upper()
+        return super().create(vals)
+
+
+    def write(self, vals):
+        if 'name' in vals:
+            vals['code'] = vals['name'].replace(" ", "").upper()
+        return super().write(vals)
 
