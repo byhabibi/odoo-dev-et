@@ -16,8 +16,15 @@ class IoTMachine(models.Model):
     current_workorder_id = fields.Many2one('mrp.workorder')
     counter = fields.Integer(default=0, store=True)
     latest_timestamp = fields.Datetime(store=True)
-    #Product PLAN
+
+    #Product Plan
     product_qty = fields.Integer(compute='_compute_production_status', store = False)
+
+    #Computed Status Condition Plan vs Actual
+    plan_status = fields.Selection([
+        ('ok':'OK'),
+        ('low':'Low'),
+    ] compute = '_compute_plan_status', store=False)
 
     # UI computed
     production_status = fields.Char(
