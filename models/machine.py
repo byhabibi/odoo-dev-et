@@ -42,6 +42,14 @@ class IoTMachine(models.Model):
         store=False
     )
 
+    @api.model('counter', 'product_qty')
+    def _compute_status_plan(self):
+        for machine in self:
+            if machine.counter >= machine.product_qty and machine.product_qty > 0:
+                machine.plan_status = 'ok'
+            else:
+                machine.plan_status = 'low'
+
     @api.depends('counter')
     def _compute_latest_counter(self):
         for machine in self:
