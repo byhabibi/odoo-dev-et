@@ -22,9 +22,9 @@ class IoTMachine(models.Model):
 
     #Computed Status Condition Plan vs Actual
     plan_status = fields.Selection([
-        ('ok':'OK'),
-        ('low':'Low'),
-    ] compute = '_compute_plan_status', store=False)
+        ('ok','OK'),
+        ('low','Low'),
+    ], compute = '_compute_plan_status', store=False)
 
     # UI computed
     production_status = fields.Char(
