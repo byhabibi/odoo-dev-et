@@ -22,6 +22,8 @@
                 <field name="current_product"/>
                 <field name="latest_counter"/>
                 <field name="latest_timestamp"/>
+                <field name="product_qty"/>
+                <field name="plan_status"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card"
@@ -68,6 +70,42 @@
                                 <div style="font-size:11px; color:#888">pcs</div>
                             </div>
 
+                            <!-- Status Achieved-->
+                            <div style="display:flex; gap:6px;">
+                                <t t-if="record.plan_status.raw_value == 'ok' ">
+                                    <div style="
+                                        margin-top:6px;
+                                        background:#d4edda;
+                                        color:#155724;
+                                        border-radius:8px
+                                        padding:4px;
+                                        font-size:11px;
+                                        font-weight:bold;
+                                        text-allign:center;
+                                    ">
+                                        Target Achieved
+                                    </div>
+                                </t>
+
+
+                                <t t-if="record.plan_status.raw_value == 'low' ">
+                                    <div style="
+                                        margin-top:6px;
+                                        background:#f8d7da;
+                                        color:#721c24;
+                                        border-radius:8px
+                                        padding:4px;
+                                        font-size:11px;
+                                        font-weight:bold;
+                                        text-allign:center;
+                                    ">
+                                        Below Target
+                                    </div>
+                                </t>
+
+                                
+
+                            </div>
 
 
                             <!-- Status + Monitoring -->
