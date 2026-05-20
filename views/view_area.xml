@@ -30,18 +30,71 @@
                             style="padding:20px; min-height:180px;">
 
                             <!-- Nama Mesin -->
-                            <div style="margin-bottom:6px;">
-                                <strong style="font-size:15px;">
-                                    <field name="name"/>
-                                </strong>
-                            </div>
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:flex-start;
+                                margin-bottom:8px;
+                            ">
 
-                            <!-- Product -->
-                            <div style="font-size:11px; color:#555; margin-bottom:8px;
-                                        white-space:normal; word-break:break-word; 
-                                        text-overflow:ellipsis;">
-                                <span style="color:#888;">Product: </span>
-                                <strong><field name="current_product"/></strong>
+                                <!-- LEFT -->
+                                <div style="flex:1;">
+
+                                    <!-- Nama Mesin -->
+                                    <div style="margin-bottom:4px;">
+                                        <strong style="font-size:15px;">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+
+                                    <!-- Product -->
+                                    <div style="
+                                        font-size:11px;
+                                        color:#555;
+                                        white-space:normal;
+                                        word-break:break-word;
+                                        line-height:1.2;
+                                        max-width:180px;
+                                    ">
+                                        <span style="color:#888;">Product: </span>
+                                        <strong>
+                                            <field name="current_product"/>
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                                <!-- RIGHT -->
+                                <div style="
+                                    text-align:right;
+                                    margin-left:8px;
+                                ">
+
+                                    <!-- Shift -->
+                                    <div style="
+                                        background:#f3f3f3;
+                                        border-radius:6px;
+                                        padding:2px 8px;
+                                        margin-bottom:4px;
+                                        font-size:11px;
+                                        font-weight:bold;
+                                    ">
+                                        SHIFT A
+                                    </div>
+
+                                    <!-- MP -->
+                                    <div style="
+                                        background:#e8f4ff;
+                                        border-radius:6px;
+                                        padding:2px 8px;
+                                        font-size:11px;
+                                        font-weight:bold;
+                                    ">
+                                        MP : 2
+                                    </div>
+
+                                </div>
+
                             </div>
 
                             <!-- Counter -->
