@@ -79,10 +79,10 @@ class IoTMachine(models.Model):
                 machine.product_qty = wo.product_id.product_qty or 0
 
                 # SHIFT
-                machine.shift_status = wo.product_id.shift_id.name if wo.product_id.shift_id else '-'
+                machine.shift_status = wo.production_id.shift_id.name if wo.production_id.shift_id else '-'
             
                 # MP / OP
-                machine.mp_name = wo.product_id.operator_id.name if wo.product_id.operator_id else '-'
+                machine.mp_name = wo.production_id.operator_id.name if wo.production_id.operator_id else '-'
             
 
             else:
