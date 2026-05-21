@@ -17,18 +17,23 @@ class IoTMachine(models.Model):
     counter = fields.Integer(default=0, store=True)
     latest_timestamp = fields.Datetime(store=True)
 
-    #Product Plan
+    # Product Plan
     product_qty = fields.Integer(compute='_compute_production_status', store = False)
 
-    #Computed Status Condition Plan vs Actual
+    # Computed Status Condition Plan vs Actual
     plan_status = fields.Selection([
         ('ok','OK'),
         ('low','Low'),
     ], compute = '_compute_plan_status', store=False)
 
+    # Shift & MP
+    shift_status = fields.Char(compute='_compute_production_status', store=False)
+    mp_name = fields.Char(compute='_compute_production_status',  store=False)
+
     # UI computed
     production_status = fields.Char(
         compute='_compute_production_status',
+        
         store=False
     )
     current_product = fields.Char(
@@ -71,9 +76,21 @@ class IoTMachine(models.Model):
             if wo and wo.state == 'progress':
                 machine.production_status = 'progress'
                 machine.current_product = wo.product_id.name or '-'
+                machine.product_qty = wo.product_id.product_qty or 0
+
+                # SHIFT
+                machine.shift_status = wo.product_id.shift_id.name if wo.product_id.shift_id else '-'
+            
+                # MP / OP
+                machine.mp_name = wo.product_id.operator_id.name if wo.product_id.operator_id else '-'
+            
+
             else:
                 machine.production_status = 'stop'
                 machine.current_product = '-'
+                machine.product_qty = 0
+                machine.shift_status = '-'
+                machine.mp_name = '-'
 
     def _sync_workorder(self):
         for machine in self:

@@ -79,7 +79,7 @@
                                         font-size:11px;
                                         font-weight:bold;
                                     ">
-                                        SHIFT A
+                                        SHIFT : <t t-esc="record.shift_status.value"/>
                                     </div>
 
                                     <!-- MP -->
@@ -90,7 +90,7 @@
                                         font-size:11px;
                                         font-weight:bold;
                                     ">
-                                        MP : 2
+                                        MP : <t t-esc="record.mp_name.value"/>
                                     </div>
 
                                 </div>
