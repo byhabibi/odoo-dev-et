@@ -24,6 +24,8 @@
                 <field name="latest_timestamp"/>
                 <field name="product_qty"/>
                 <field name="plan_status"/>
+                <field name="shift_status"/>
+                <field name="mp_name"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card"
