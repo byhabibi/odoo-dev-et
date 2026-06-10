@@ -26,6 +26,8 @@ Module Odoo untuk:
 - Integrasi dengan Work Order (MRP)
 - Grafik Plan vs Actual
 - Status mesin (Running / Stop) sesuai Work Order
+- Achievement Rate Status
+- Actual SPH
 
 ### 🔧 Install Module
 
