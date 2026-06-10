@@ -148,7 +148,7 @@ Counter Mesin (Sebelum) :
 ![Dashboard](img/Machine.png)
 
 Counter Mesin (Sesudah) :
-![Dashboard](img/COUNTER.png)
+![Count](img/COUNTER.png)
 
 Input Mesin:
 ![New_Machine](img/mesin.png)
