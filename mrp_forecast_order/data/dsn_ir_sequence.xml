@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data noupdate="0">
+        <record id="dsn_sequence_forecast_order" model="ir.sequence">
+            <field name="name">DSN Forecast Order</field>
+            <field name="code">forecast.order</field>
+            <field name="prefix">FRCST/%(month)s/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+         <record id="dsn_sequence_demand" model="ir.sequence">
+            <field name="name">DSN Demand</field>
+            <field name="code">dsn.demand</field>
+            <field name="prefix">DEMAND/%(month)s/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="dsn_sequence_mrp" model="ir.sequence">
+            <field name="name">DSN MRP</field>
+            <field name="code">dsn.mrp</field>
+            <field name="prefix">MRP/%(month)s/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="dsn_sequence_mps" model="ir.sequence">
+            <field name="name">DSN MPS</field>
+            <field name="code">dsn.mps</field>
+            <field name="prefix">MPS/%(month)s/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

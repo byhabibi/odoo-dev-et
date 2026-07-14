@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_dsn_approval_mrp","access_dsn_approval_mrp","model_dsn_approval_mrp","dsn_approval.group_approval_user",1,1,1,1
+"access_dsn_mrp_approval_user_line","access_dsn_mrp_approval_user_line","model_dsn_mrp_approval_user_line","dsn_approval.group_approval_user",1,1,1,1
+"access_dsn_mrp_approval_job_line","access_dsn_mrp_approval_job_line","model_dsn_mrp_approval_job_line","dsn_approval.group_approval_user",1,1,1,1
+"access_dsn_mrp_production_approval_line","access_dsn_mrp_production_approval_line","model_dsn_mrp_production_approval_line","dsn_approval.group_approval_user",1,1,1,1

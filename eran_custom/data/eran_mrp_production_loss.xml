@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+ 
+        <!--
+            Productivity Loss reason kategori "Performance".
+            Wajib ada minimal 1 record kategori ini supaya
+            mrp.workorder.button_start() tidak menolak saat
+            WO di-start ulang (kasus: Stop -> Start lagi).
+ 
+            noupdate="1" supaya kalau user mengubah/menghapus
+            record ini secara manual dari UI, tidak akan
+            ke-overwrite tiap kali module di-upgrade.
+        -->
+        <record id="eran_mes_productivity_loss_performance" model="mrp.workcenter.productivity.loss">
+            <field name="name">MES - Downtime (Auto)</field>
+            <field name="loss_type">performance</field>
+        </record>
+ 
+        <!--
+            Tambahan: loss reason kategori Availability, jaga-jaga
+            kalau versi Odoo/alur lain juga butuh kategori ini
+            (aman untuk dibuat sekalian, tidak mengganggu).
+        -->
+        <record id="eran_mes_productivity_loss_availability" model="mrp.workcenter.productivity.loss">
+            <field name="name">MES - Stop Reason (Auto)</field>
+            <field name="loss_type">availability</field>
+        </record>
+ 
+    </data>
+</odoo>

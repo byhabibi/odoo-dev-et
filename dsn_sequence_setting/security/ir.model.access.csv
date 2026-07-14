@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_dsn_sales_sequence_setting","access_dsn_sales_sequence_setting","model_dsn_sales_sequence_setting","base.group_user",1,1,1,1
+"access_dsn_purchase_sequence_setting","access_dsn_purchase_sequence_setting","model_dsn_purchase_sequence_setting","base.group_user",1,1,1,1
+"access_dsn_mrp_production_sequence_setting","access_dsn_mrp_production_sequence_setting","model_dsn_mrp_production_sequence_setting","base.group_user",1,1,1,1
+"access_dsn_account_move_sequence_setting","access_dsn_account_move_sequence_setting","model_dsn_account_move_sequence_setting","base.group_user",1,1,1,1
+"access_dsn_inventory_sequence_setting","access_dsn_inventory_sequence_setting","model_dsn_inventory_sequence_setting","base.group_user",1,1,1,1
+"access_dsn_mrp_production_sequence_setting","access_dsn_mrp_production_sequence_setting","model_dsn_mrp_production_sequence_setting","base.group_user",1,1,1,1

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>        
+    
+    <record id="action_dsn_to_approve_manufacture_order" model="ir.actions.act_window">
+        <field name="name">Manufacture Order Approval</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mrp.production</field>
+        <field name="domain">[('state_approval', '=', 'to_approve'), ('state', 'not in', ['cancel', 'done'])]</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_assigned_to_ids': 1, 'create':False, 'delete':False}</field>
+        <field name="search_view_id" ref="mrp.view_mrp_production_filter" />
+    </record>
+
+</odoo>

@@ -1,0 +1,2 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_dsn_hr_employee_approver","access_dsn_hr_employee_approver","model_dsn_hr_employee_approver","base.group_user",1,1,1,1

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- <record id="approval_rule_management" model="ir.rule">
+        <field name="name">Manage Approval Administrator</field>
+        <field name="model_id" ref="model_dsn_approval_purchase"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('dsn_approval.group_approval_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="approval_rule_management" model="ir.rule">
+        <field name="name">Manage Approval Administrator</field>
+        <field name="model_id" ref="model_dsn_approval_purchase"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('dsn_approval.group_approval_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record> -->
+
+</odoo>

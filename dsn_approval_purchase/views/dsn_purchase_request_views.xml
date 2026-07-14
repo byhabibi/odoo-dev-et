@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dsn_approval_purchase_request_form_view" model="ir.ui.view">
+        <field name="name">dsn.approval.purchase.request.form.inherit</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_approved']" position="attributes">
+                <!-- <attribute name="groups">dsn_approval.group_approval_user</attribute> -->
+                <attribute name="attrs">{'invisible': ['|', ('user_in_assigned_to', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='assigned_to']" position="after">
+                <field name="assigned_to_ids" widget="many2many_tags" invisible="1"/>
+                <field name="user_in_assigned_to"/>
+            </xpath>
+            <xpath expr="//field[@name='assigned_to']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]" position="after">
+                <page name="approver" string="Approver">
+                    <group>
+                        <group>
+                            <field name="approval_purchase_id"/>
+                            <field name="approval_rule"/>
+                            <field name="approval_type"/>
+                        </group>
+                    </group>
+                    <field name="approval_line_ids" mode="tree" readonly="1">
+                        <tree string="Approval Line" name="approval_line" editable="bottom">
+                            <field name="user_id"/>
+                            <field name="is_approved"/>
+                            <field name="date_approved"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- purchase request to approve search view -->
+    <record id="dsn_to_approve_view_purchase_request_search" model="ir.ui.view">
+        <field name="name">dsn.to.approve.pr.search</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <filter name="assigned_to_ids" string="Assigned to me" domain="[('assigned_to_ids','in',[uid])]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

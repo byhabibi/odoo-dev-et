@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2018-2019 ForgeFlow, S.L.
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl-3.0) -->
+<odoo>
+    <template id="report_purchase_request">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure" />
+                        <h2>
+                            Purchase Request
+                            <span t-field="o.name" />
+                        </h2>
+                        <div class="row mt32 mb32">
+                            <div class="col-auto">
+                                <strong>Request Reference:</strong>
+                                <br />
+                                <span t-field="o.name" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Creation Date:</strong>
+                                <br />
+                                <span t-field="o.date_start" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Source:</strong>
+                                <br />
+                                <span t-field="o.origin" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Description:</strong>
+                                <br />
+                                <span t-field="o.description" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Requested by:</strong>
+                                <br />
+                                <span t-field="o.requested_by" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Assigned to:</strong>
+                                <br />
+                                <span t-field="o.assigned_to" />
+                            </div>
+                            <div class="col-auto">
+                                <strong>Picking Type:</strong>
+                                <br />
+                                <span t-field="o.picking_type_id" />
+                            </div>
+                        </div>
+                        <t t-if="o.line_ids">
+                            <h3>Products</h3>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <strong>Description</strong>
+                                        </th>
+                                        <th groups="analytic.group_analytic_accounting">
+                                            <strong>Analytic Distribution</strong>
+                                        </th>
+                                        <th class="text-right">
+                                            <strong>Qty</strong>
+                                        </th>
+                                        <th class="text-center" groups="uom.group_uom">
+                                            <strong>Product UoM</strong>
+                                        </th>
+                                        <th>
+                                            <strong>Estimated Cost</strong>
+                                        </th>
+                                        <th class="text-right">
+                                            <strong>Requested Date</strong>
+                                        </th>
+                                        <th>
+                                            <strong>Specifications</strong>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.line_ids" t-as="line_id">
+                                        <td>
+                                            <span t-field="line_id.name" />
+                                        </td>
+                                        <td groups="analytic.group_analytic_accounting">
+                                            <span
+                                                t-field="line_id.analytic_distribution"
+                                            />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line_id.product_qty" />
+                                        </td>
+                                        <t>
+                                            <td
+                                                class="text-center"
+                                                groups="uom.group_uom"
+                                            >
+                                                <span
+                                                    t-field="line_id.product_uom_id.category_id.name"
+                                                />
+                                            </td>
+                                        </t>
+                                        <td>
+                                            <span t-field="line_id.estimated_cost" />
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line_id.date_required" />
+                                        </td>
+                                        <td>
+                                            <span t-field="line_id.specifications" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                        <div class="oe_structure" />
+                        <br/><br/><br/><br/><br/>
+                          <table style="width:100%; background-image: url('/eran_custom/static/src/img/stample_purchase.png'); background-position: 150px 0px; background-repeat: no-repeat;">
+                            <tr>
+                                <t t-if="len(o.approval_line_ids) &gt; 3">
+                                  <t t-if="o.approval_line_ids[0].user_id.id == 38 or o.approval_line_ids[0].user_id.id == 61">
+                                    <td style="width:180px;text-align:center;">Asmen By,</td>
+                                  </t>
+                                  <t t-else="">
+                                    <td style="width:180px;text-align:center;">Supervisor By,</td>
+                                  </t>
+                                </t>
+                                <t t-if="len(o.approval_line_ids) &gt; 2">
+                                  <td style="width:180px;text-align:center;">Manager By,</td>
+                                </t>
+                                <td style="width:180px;text-align:center;">Director By,</td>
+                                <td style="width:180px;text-align:center;">Presiden Director By,</td>
+                            </tr>
+                            <tr>
+                                <t t-if="len(o.approval_line_ids) &gt; 3">
+                                  <td style="height:100px;width:100px; vertical-align: middle;">
+                                  </td>
+                                </t>
+                                <t t-if="len(o.approval_line_ids) &gt; 2">
+                                  <td style="height:100px;width:100px; vertical-align: middle;">
+                                </td>
+                                </t>
+                                <td style="height:80px;width:120px; vertical-align: middle;">
+                                </td>
+                                <td style="height:80px;width:120px; vertical-align: middle;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <t t-if="len(o.approval_line_ids) &gt; 0">
+                                    <td style="text-align:center; height:20px;">
+                                        <span t-esc="o.approval_line_ids[0].user_id.name" style="font-size:12px;"/>
+                                    </td>
+                                </t>
+                                <t t-if="len(o.approval_line_ids) &gt; 1">
+                                    <td style="text-align:center; height:20px;">
+                                        <span t-esc="o.approval_line_ids[1].user_id.name" style="font-size:12px;"/>
+                                    </td>
+                                </t>
+                                <t t-if="len(o.approval_line_ids) &gt; 2">
+                                    <td style="text-align:center; height:20px;">
+                                        <span t-esc="o.approval_line_ids[2].user_id.name" style="font-size:12px;"/>
+                                    </td>
+                                </t>
+                                <t t-if="len(o.approval_line_ids) &gt; 3">
+                                    <td style="text-align:center; height:20px;">
+                                        <span t-esc="o.approval_line_ids[3].user_id.name" style="font-size:12px;"/>
+                                    </td>
+                                </t>
+                            </tr>
+                          </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

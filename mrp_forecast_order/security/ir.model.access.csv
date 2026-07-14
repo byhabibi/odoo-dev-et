@@ -1,0 +1,10 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_dsn_forecast_order","access_dsn_forecast_order","model_dsn_forecast_order","base.group_user",1,1,1,1
+"access_dsn_forecast_order_line","access_dsn_forecast_order_line","model_dsn_forecast_order_line","base.group_user",1,1,1,1
+"access_dsn_demand_planning","access_dsn_demand_planning","model_dsn_demand_planning","base.group_user",1,1,1,1
+"access_dsn_demand_planning_line","access_dsn_demand_planning_line","model_dsn_demand_planning_line","base.group_user",1,1,1,1
+"access_dsn_mps","access_dsn_mps","model_dsn_mps","base.group_user",1,1,1,1
+"access_dsn_mps_wizard","access_dsn_mps_wizard","model_dsn_mps_wizard","base.group_user",1,1,1,1
+"access_dsn_mrp","access_dsn_mrp","model_dsn_mrp","base.group_user",1,1,1,1
+"access_dsn_mrp_wizard","access_dsn_mrp_wizard","model_dsn_mrp_wizard","base.group_user",1,1,1,1
+"access_dsn_mrp_line_wizard","access_dsn_mrp_line_wizard","model_dsn_mrp_line_wizard","base.group_user",1,1,1,1

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="action_template_mps_report_xlsx" model="ir.actions.report">
+        <field name="name">Template MPS</field>
+        <field name="model">dsn.mps.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">mrp_forecast_order.template_import_mps_report_xlsx</field>
+        <field name="report_file">mrp_forecast_order.template_import_mps_report_xlsx</field>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

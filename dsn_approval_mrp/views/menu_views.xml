@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_item_dsn_approval_setting_mrp"
+                name="Manufacture Order"
+                sequence="10"
+                parent="dsn_approval.menu_item_dsn_approval_setting"
+                groups="dsn_approval.group_approval_manager"
+                action="action_dsn_approval_mrp"/>
+
+
+
+    <menuitem id="menu_item_dsn_to_approve_mrp"
+                name="Mrp"
+                sequence="20"
+                parent="dsn_approval.menu_item_dsn_to_approve">
+                <menuitem id="menu_item_dsn_to_approve_manufacture_order"
+                        name="Manufacture Order"
+                        sequence="1"
+                        groups="dsn_approval.group_approval_manager"
+                        action="action_dsn_to_approve_manufacture_order"/>
+                
+    </menuitem>
+
+</odoo>

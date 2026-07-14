@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dsn_account_move_form_view" model="ir.ui.view">
+        <field name="name">dsn.account.move.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <field name="from_approval" invisible="1"/>
+                <field name="reset_from_approval" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="attrs">{'invisible': [('from_approval', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="state_entry" statusbar_visible="draft,to_approve,posted" widget="statusbar" attrs="{'invisible': [('from_approval', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_post']" position="after">
+                <button name="request_approval" type="object" string="Request Approval" context="{'validate_analytic': True}" class="oe_highlight" attrs="{'invisible': ['|','|','|', ('state', '!=', 'draft'),('state_entry', '!=', 'draft'), ('move_type', '!=', 'entry'),('reset_from_approval', '=', True)]}"/>
+                <button name="button_approve" type="object" string="Approve" context="{'validate_analytic': True}" class="oe_highlight" attrs="{'invisible': ['|','|','|','|', ('state', 'in', ['posted', 'cancel']),('state_entry', '!=', 'to_approve'), ('move_type', '!=', 'entry'), ('user_in_assigned_to', '=', False),('reset_from_approval', '=', True)]}"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_post']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|','|',('reset_from_approval', '=', False), ('state', '!=', 'draft'), ('move_type', '!=', 'entry')]}</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='other_info']" position="after">
+                <page name="approver" string="Approver" attrs="{'invisible': [('move_type', '!=', 'entry')]}">
+                    <group>
+                        <group>
+                            <field name="approval_accounting_id"/>
+                            <field name="approval_rule"/>
+                            <field name="approval_type"/>
+                        </group>
+                    </group>
+                    <field name="approval_line_ids" mode="tree" readonly="1">
+                        <tree string="Approval Line" name="approval_line" editable="bottom">
+                            <field name="user_id"/>
+                            <field name="is_approved"/>
+                            <field name="date_approved"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="state" invisible="1"/>
+                <field name="user_in_assigned_to" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- jounral entry to approve search view -->
+    <record id="dsn_to_approve_view_account_move_filter" model="ir.ui.view">
+        <field name="name">dsn.to.approve.entry.search</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <filter name="assigned_to_ids" string="Assigned to me" domain="[('assigned_to_ids','in',[uid])]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

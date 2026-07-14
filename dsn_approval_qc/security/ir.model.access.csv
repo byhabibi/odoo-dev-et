@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_dsn_approval_qc","access_dsn_approval_qc","model_dsn_approval_qc","dsn_approval.group_approval_user",1,1,1,1
+"access_dsn_qc_approval_user_line","access_dsn_qc_approval_user_line","model_dsn_qc_approval_user_line","dsn_approval.group_approval_user",1,1,1,1
+"access_dsn_qc_approval_job_line","access_dsn_qc_approval_job_line","model_dsn_qc_approval_job_line","dsn_approval.group_approval_user",1,1,1,1

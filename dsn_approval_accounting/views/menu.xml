@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action Window Approval Settings -->
+    <record id="action_dsn_approval_accounting" model="ir.actions.act_window">
+      <field name="name">Accounting Approval</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">dsn.approval.accounting</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Action Window To Approve -->
+    <record id="action_dsn_to_approve_journal_entry" model="ir.actions.act_window">
+      <field name="name">Journal Entry</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">account.move</field>
+      <field name="domain">[('state_entry', '=', 'to_approve')]</field>
+      <field name="view_mode">tree,form</field>
+      <field name="context">{'search_default_assigned_to_ids': 1, 'create':False, 'delete':False}</field>
+      <field name="search_view_id" ref="dsn_approval_accounting.dsn_to_approve_view_account_move_filter"/>
+      
+    </record>
+    <!-- Approval Settings Menuitem -->
+    <menuitem id="menu_item_dsn_approval_setting_accounting"
+              name="Accounting"
+              sequence="2"
+              parent="dsn_approval.menu_item_dsn_approval_setting"
+              groups="dsn_approval.group_approval_manager"
+              action="action_dsn_approval_accounting"/>
+    <!-- To Approve Menuitem -->
+    <menuitem id="menu_item_dsn_to_approve_accounting"
+                name="Accounting"
+                sequence="1"
+                parent="dsn_approval.menu_item_dsn_to_approve">
+                <menuitem id="menu_item_dsn_to_approve_journal_entry"
+                        name="Journal Entry"
+                        sequence="1"
+                        groups="dsn_approval.group_approval_manager"
+                        action="action_dsn_to_approve_journal_entry"/>
+    </menuitem>
+</odoo>

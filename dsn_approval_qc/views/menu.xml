@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>    
+    <!-- Action Window Approval Settings -->
+    <record id="action_dsn_approval_qc" model="ir.actions.act_window">
+      <field name="name">Quality Check Approval</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">dsn.approval.qc</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Approval Settings Menuitem -->
+    <menuitem id="menu_item_dsn_approval_setting_qc"
+              name="Quality Check"
+              sequence="11"
+              parent="dsn_approval.menu_item_dsn_approval_setting"
+              groups="dsn_approval.group_approval_manager"
+              action="action_dsn_approval_qc"/>
+    <!-- To Approve Menuitem -->
+    
+    <menuitem id="menu_item_dsn_to_approve_quality"
+                name="Quality"
+                sequence="21"
+                parent="dsn_approval.menu_item_dsn_to_approve">
+                <menuitem id="menu_item_dsn_to_approve_qc"
+                        name="Quality Check"
+                        sequence="1"
+                        groups="dsn_approval.group_approval_manager"
+                        action="action_dsn_approval_qc"/>
+    </menuitem>
+</odoo>

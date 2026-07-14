@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dsn_purchase_setting_sequences_view_form" model="ir.ui.view">
+        <field name="name">dsn.purchase.setting.sequence.view.form</field>
+        <field name="model">dsn.purchase.sequence.setting</field>
+        <field name="arch" type="xml">
+            <form string="Sequence Settings">
+                <header>
+                    <button name="create_sequence" string="Set Sequence" class="btn-primary" type="object"
+                        attrs="{'invisible': [('sequence_id', '!=', False)]}"/>
+                    <button name="update_sequence_code" string="Update Sequence Code" class="btn-primary" type="object"
+                        attrs="{'invisible': [('state', '!=', 'confirm')]}"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="type" required="1" attrs="{'readonly': [('sequence_id', '!=', False)]}"/>
+                            <field name="code" required="1" attrs="{'readonly': [('sequence_id', '!=', False)]}"/>
+                        </group>
+                        <group>
+                            <field name="state" invisible="1" readonly="1"/>
+                            <field name="company_id" required="1" attrs="{'readonly': [('sequence_id', '!=', False)]}"
+                            options="{'no_create_edit': True, 'no_quick_create':True, 'no_create': True}"/>
+                            <field name="sequence_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="dsn_purchase_sequences_setting_view_tree" model="ir.ui.view">
+        <field name="name">dsn.purchase.sequence.setting.view.tree</field>
+        <field name="model">dsn.purchase.sequence.setting</field>
+        <field name="arch" type="xml">
+            <tree string="Sequencing Settings">
+                <field name="type"/>
+                <field name="code"/>
+                <field name="company_id"/>
+                <field name="sequence_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="dsn_purchase_sequences_setting_view_search" model="ir.ui.view">
+        <field name="name">dsn.purchase.sequence.setting.view.search</field>
+        <field name="model">dsn.purchase.sequence.setting</field>
+        <field eval="3" name="priority"/>
+        <field name="arch" type="xml">
+            <search string="Purchase Sequences">
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="by_type" domain="[]"  context="{'group_by': 'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="dsn_purchase_sequence_setting_action" model="ir.actions.act_window">
+        <field name="name">Purchase Sequences</field>
+        <field name="res_model">dsn.purchase.sequence.setting</field>
+        <field name="search_view_id" ref="dsn_purchase_sequences_setting_view_search"/>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_by_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a new record
+            </p>
+        </field>
+    </record>
+
+</odoo>

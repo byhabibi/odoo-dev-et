@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem 
+        id="sequence_setting_root" 
+        name="Sequence Setting" 
+        sequence="10" 
+        web_icon="dsn_sequence_setting,static/description/icon_sequence.png"/>
+        <menuitem 
+            id="sequence_setting_categ" 
+            name="Sequence Setting" 
+            parent="sequence_setting_root" 
+            sequence="10"/>
+            <menuitem 
+                id="menu_sequence_setting_sales" 
+                name="Sales" 
+                action="dsn_sales_sequence_setting_action" 
+                parent="sequence_setting_categ" 
+                sequence="1"/>
+            <menuitem 
+                id="menu_sequence_setting_purchase" 
+                name="Purchase" 
+                action="dsn_purchase_sequence_setting_action" 
+                parent="sequence_setting_categ" 
+                sequence="2"/>
+            <menuitem 
+                id="menu_sequence_setting_account" 
+                name="Accounting" 
+                action="dsn_account_sequence_setting_action" 
+                parent="sequence_setting_categ" 
+                sequence="3"/>
+            <menuitem 
+                id="menu_sequence_setting_inventory" 
+                name="Inventory" 
+                action="dsn_inventory_sequence_setting_action" 
+                parent="sequence_setting_categ" 
+                sequence="4"/>
+            <menuitem 
+                id="menu_sequence_setting_manufacture" 
+                name="Manufacturing" 
+                action="dsn_mrp_sequence_setting_action" 
+                parent="sequence_setting_categ" 
+                sequence="5"/>
+
+</odoo>

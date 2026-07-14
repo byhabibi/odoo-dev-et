@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Base menuitem -->
+    <menuitem id="menu_item_dsn_approval"
+            name="Approval"
+            sequence="10"
+            groups="dsn_approval.group_approval_manager"
+            web_icon="dsn_approval,static/description/icon.png"/>
+    <!-- Approval Settings menuitem -->
+    <menuitem id="menu_item_dsn_approval_setting" name="Approval Setting" sequence="1" parent="dsn_approval.menu_item_dsn_approval"/>
+    <!-- To Approve menuitem -->
+    <menuitem id="menu_item_dsn_to_approve" name="To Approve" sequence="2" parent="dsn_approval.menu_item_dsn_approval"/>
+</odoo>

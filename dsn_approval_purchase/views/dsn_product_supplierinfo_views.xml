@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dsn_approval_product_supplierinfo_form_view" model="ir.ui.view">
+        <field name="name">dsn.approval.product.supplierinfo.form.inherit</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="request_approval" type="object" string="Request Approval" context="{'validate_analytic': True}" class="oe_highlight" states="draft"/>
+                    <button name="button_approve" type="object" string="Approve" context="{'validate_analytic': True}" class="oe_highlight" states="waiting" attrs="{'invisible': ['|', ('user_in_assigned_to', '=', False)]}"/>
+                    <button name="reset_to_draft" type="object" string="Reset To Draft" context="{'validate_analytic': True}" states="done"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,waiting,done"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="attrs">{'required': 1}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_end']" position="attributes">
+                <attribute name="attrs">{'required': 1}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="user_in_assigned_to" invisible="1"/>
+            </xpath>
+            <xpath expr="//sheet/group" position="after">
+                <notebook>
+                    <page name="approver" string="Approver">
+                        <group>
+                            <group>
+                                <field name="approval_purchase_id"/>
+                                <field name="approval_rule"/>
+                                <field name="approval_type"/>
+                            </group>
+                        </group>
+                        <field name="approval_line_ids" mode="tree" readonly="1">
+                            <tree string="Approval Line" name="approval_line" editable="bottom">
+                                <field name="user_id"/>
+                                <field name="is_approved"/>
+                                <field name="date_approved"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+            <!-- locked if state is done -->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_name']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_code']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='delay']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_tmpl_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='min_qty']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='price']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_end']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+    <!-- purchase supplierinfo to approve search view -->
+    <record id="dsn_to_approve_product_supplierinfo_search_view" model="ir.ui.view">
+        <field name="name">dsn.to.approve.supplierinfo.search</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <filter name="assigned_to_ids" string="Assigned to me" domain="[('assigned_to_ids','in',[uid])]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

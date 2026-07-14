@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="dsn_mps_wizard_form_view" model="ir.ui.view">
+            <field name="name">dsn.mps.wizard.form.view</field>
+            <field name="model">dsn.mps.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="demand_line_id" readonly="1" invisible="1"/>
+                            <button name="template_import_mps" type="object" class="fa fa-download" string="Template"/>
+                        </group>
+                        <group>
+                            <field name="file" filename="file_name"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="import_mps" type="object"
+                            string="Import"
+                             class="oe_highlight"
+                            data-hotkey="w"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="dsn_action_mps_wizard" model="ir.actions.act_window">
+            <field name="name">Import MPS</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dsn.mps.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="dsn_mps_wizard_form_view"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dsn_view_demand_order_tree" model="ir.ui.view">
+        <field name="name">dsn.view.demand.order.tree</field>
+        <field name="model">dsn.demand.planning</field>
+        <field name="arch" type="xml">
+            <tree
+                decoration-info="state == 'draft'"
+                decoration-warning="state == 'in_progress'"
+                decoration-success="state == 'done'"
+                name="Demand Order">
+                <field name="name"/>
+                <field name="start_date"></field>
+                <field name="end_date"></field>
+                <field name="state" widget="badge"
+                    decoration-info="state == 'draft'"
+                    decoration-warning="state == 'in_progress'"
+                    decoration-success="state == 'done'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="dsn_view_demand_order_form" model="ir.ui.view">
+        <field name="name">dsn.view.demand.order.form</field>
+        <field name="model">dsn.demand.planning</field>
+        <field name="arch" type="xml">
+            <form string="Demand Order">
+                <header>
+                    <button name="search_data" string="Search" type="object" icon="fa-search" class='oe_highlight' attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible':['|', ('state','!=','draft'), ('line_ids', '=', [])]}"/>
+                    <button name="reset_to_draft" states="in_progress" string="Set to Draft" type="object"/>
+                    <button name="set_mrp" states="in_progress" string="Set MRP" type="object" class="oe_highlight" confirm="Are you sure about the quantity that will be produced?"/>
+                    <field name="state" widget="statusbar"></field>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                         <button class="oe_stat_button" name="view_mrp" type="object" icon="fa-pencil"
+                            attrs="{'invisible':[('mrp_count','=',0)]}">
+                            <field string="MRP" name="mrp_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_edit_only">
+                        <label for="name" class="oe_inline" string="Document Number"/>
+                    </div>
+                    <h1>
+                        <field name="name" class="oe_inline" readonly="1"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <label for="start_date" string="Period"/>
+                            <div>
+                                <field name="start_date" required="1" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/> - <field name="end_date" required="1" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Demand Detail">
+                            <field name="line_ids" attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                <tree editable="bottom" create="0">
+                                    <field name="level" readonly="1" invisible="1"></field>
+                                    <field name="product_id" options="{'no_create': True}" readonly="1" domain="[('sale_ok', '=', True)]"/>
+                                    <field name="product_tmpl_id" invisible="1"></field>
+                                    <field name="uom_id" readonly="1"></field>
+                                    <field name="bom_id" required="1" options="{'no_create': True}" domain="[('product_tmpl_id', '=', product_tmpl_id)]"></field>
+                                    <field name="bom_type" readonly="1"></field>
+                                    <field name="demand_line_id" readonly="1"></field>
+                                    <field name="buffer_stock" readonly="1"></field>
+                                    <field name="demand_qty" readonly="1"></field>
+                                    <field name="stock_on_hand" readonly="1"></field>
+                                    <field name="production_qty" readonly="1"></field>
+                                    <field name="mps_qty" readonly="1"></field>
+                                    <field name="fulfilled_qty" readonly="1"></field>
+                                    <field name="deadline_date" required="1"></field>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" optional="show"  readonly="1"/>
+                                    <field name="forecast_ids" widget="many2many_tags" readonly="1" optional="show"></field>
+                                    <field name="sale_order_ids" widget="many2many_tags" readonly="1" optional="show"></field>
+                                    <field name="note" optional="show"  readonly="1"></field>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="dsn_action_demand_order">
+        <field name="name">Demand Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dsn.demand.planning</field>
+        <field name="context">{}</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to start a new demand order process.
+            </p>
+            <p>
+                Demand orders plan the production of semi-finished and finished goods and make purchases for materials.
+            </p>
+        </field>
+    </record>
+
+    <record id="dsn_action_set_mrp_from_list" model="ir.actions.server">
+        <field name="name">Set MRP</field>
+        <field name="model_id" ref="mrp_forecast_order.model_dsn_demand_planning"/>
+        <field name="binding_model_id" ref="mrp_forecast_order.model_dsn_demand_planning"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.set_mrp()
+        </field>
+    </record>
+
+    <record id="dsn_view_demand_order_detail_tree" model="ir.ui.view">
+        <field name="name">dsn.view.demand.order.detail.tree</field>
+        <field name="model">dsn.demand.planning.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="level" readonly="1" invisible="1"></field>
+                <field name="product_id" options="{'no_create': True}" readonly="1" domain="[('sale_ok', '=', True)]"/>
+                <field name="product_tmpl_id" invisible="1"></field>
+                <field name="uom_id" readonly="1"></field>
+                <field name="bom_id" readonly="1" options="{'no_create': True}" domain="[('product_tmpl_id', '=', product_tmpl_id)]"></field>
+                <field name="bom_type" readonly="1"></field>
+                <field name="demand_line_id" readonly="1"></field>
+                <field name="buffer_stock" readonly="1"></field>
+                <button icon="fa-info-circle" name="view_buffer_stock" type="object"  attrs="{'invisible': [('bom_type', '!=', 'normal')]}"/>
+                <field name="demand_qty" readonly="1"></field>
+                <field name="stock_on_hand" readonly="1"></field>
+                <field name="production_qty" readonly="1"></field>
+                <field name="mps_qty" readonly="1"></field>
+                <field name="fulfilled_qty" readonly="1"></field>
+                <field name="deadline_date"></field>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" optional="show"  readonly="1"/>
+                <field name="forecast_ids" widget="many2many_tags" readonly="1" optional="show"></field>
+                <field name="sale_order_ids" widget="many2many_tags" readonly="1" optional="show"></field>
+                <field name="note" optional="show"  readonly="1"></field>
+                <button name="create_buffer_stock" string="Generate Buffer Stock" type="object" attrs="{'invisible': [('bom_type', '!=', 'normal')]}"/>
+                <button name="generate_mps" string="Generate MPS" type="object" attrs="{'invisible': ['|','|', ('mps_qty', '&gt;=', 'production_qty'),('production_qty', '=', 0),('bom_type', '!=', 'normal')]}"/>
+                <button name="view_mps" string="MPS" type="object" icon="fa-info-circle" attrs="{'invisible': ['|', ('production_qty', '=', 0),('bom_type', '!=', 'normal')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="dsn_view_demand_order_detail_filter" model="ir.ui.view">
+        <field name="name">dsn.view.demand.order.detail.filter</field>
+        <field name="model">dsn.demand.planning.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Demand Order Detail">
+                <field name="demand_id" string="Demand Order" filter_domain="[('demand_id', 'ilike', self)]"/>
+                <field name="product_id" string="Product" filter_domain="[('product_id', 'ilike', self)]"/>
+                <group expand="0" string="Group By...">
+                    <filter string="Demand Order" name="demand_order" domain="[]" context="{'group_by': 'demand_id'}"/>
+                    <filter string="Deadline Date" name="deadline_date" domain="[]" context="{'group_by': 'deadline_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="dsn_action_demand_order_detail">
+        <field name="name">Demand Order Detail</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dsn.demand.planning.line</field>
+        <field name="domain">[('demand_id.state', '!=', 'draft')]</field>
+        <field name="context">{'create': 0, 'copy': 0, 'delete':0, 'search_default_demand_order': 1}</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="dsn_view_demand_order_detail_filter"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to start a new demand order for demand order detail process.
+            </p>
+            <p>
+                Demand orders detail plan the production of semi-finished and finished goods.
+            </p>
+        </field>
+    </record>
+</odoo>

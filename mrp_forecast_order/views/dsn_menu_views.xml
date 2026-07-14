@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="dsn_menu_sale_forecast" name="Forecast" parent="sale.sale_menu_root" sequence="11"/>
+        <menuitem id="dsn_menu_sale_forecast_order" name="Forecast Order" parent="dsn_menu_sale_forecast" action="dsn_action_sale_forecast_order" sequence="10"/>
+
+        <!--PLAMNING-->
+        <menuitem id="dsn_menu_sale_demand_order_planning" name="Demand Order" parent="mrp_mps.mrp_mps_menu_planning" action="dsn_action_demand_order" sequence="20"/>
+        <menuitem id="dsn_menu_sale_demand_order_detail_planning" name="Demand Order Detail" parent="mrp_mps.mrp_mps_menu_planning" action="dsn_action_demand_order_detail" sequence="30"/>
+        <menuitem id="dsn_menu_mps_planning" name="MPS" parent="mrp_mps.mrp_mps_menu_planning" action="dsn_action_mps" sequence="30"/>
+        <menuitem id="dsn_menu_mrp_planning" name="MRP" parent="mrp_mps.mrp_mps_menu_planning" action="dsn_action_mrp" sequence="40"/>
+</odoo>
