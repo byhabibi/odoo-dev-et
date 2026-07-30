@@ -13,8 +13,6 @@ class EranLossOpportunity(models.Model):
                     string="Customer", 
                     domain=[('customer_rank', '>', 0)]
                 )
-    # customer_id = fields.Integer(string="Customer ID", related="customer.id", store=True)
-
     category_group_id = fields.Many2one('eran.category.group', string="Category Group")
     target = fields.Monetary(string="Target")
     problem = fields.Char(string="Problem")
