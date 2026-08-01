@@ -509,6 +509,17 @@ class eranplanningSlot(models.Model):
                 shift = self.env['eran.master.shift'].search([('start_time', '=', time_start_planning), ('end_time', '=', time_end_planning)], limit=1)
                 slot.shift_id = shift.id if shift else False
 
+    @api.depends('state', 'role_id.color', 'resource_id.color')
+    def _compute_color(self):
+        for slot in self:
+            if slot.state == 'draft':
+                slot.color = 8  # indeks warna Silver / Abu-abu bawaan Odoo
+            elif slot.state == 'published':
+                slot.color = 5  # indeks warna Hijau bawaan Odoo
+            else:
+                # Jika statusnya di luar draft/publish, jalankan logika asli bawaan Odoo
+                slot.color = slot.role_id.color or slot.resource_id.color
+                
 class eranAttendanceOvertime(models.Model):
     _name = 'eran.hr.overtime'
     _description = 'attendance overtime'
