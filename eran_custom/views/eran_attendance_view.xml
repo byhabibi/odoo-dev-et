@@ -127,8 +127,8 @@
                 <field name="shift_id"/>
                 <field name="checkin_lembur"/>
                 <field name="checkout_lembur"/>
-                <field name="istirahat_lembur" widget="float_time"/>
-                <field name="total_lembur" widget="float_time"/>
+                <field name="istirahat_lembur"/>
+                <field name="total_lembur"/>
             </xpath>
         </field>
     </record>
@@ -141,7 +141,7 @@
             <xpath expr="//field[@name='check_out']" position="after">
                 <field name="checkin_lembur"/>
                 <field name="checkout_lembur"/>
-                <field name="istirahat_lembur" widget="float_time"/>
+                <field name="istirahat_lembur" />
             </xpath>
         </field>
     </record>

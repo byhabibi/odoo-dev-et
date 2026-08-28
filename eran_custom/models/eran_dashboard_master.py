@@ -8,21 +8,6 @@ class EranLossOpportunity(models.Model):
 
     date = fields.Date(string="Date", default=fields.Date.today())
     currency_id = fields.Many2one('res.currency', string="Currency", default=lambda self: self.env.company.currency_id)
-    customer = fields.Many2one(
-                    'res.partner', 
-                    string="Customer", 
-                    domain=[('customer_rank', '>', 0)]
-                )
-    category_group_id = fields.Many2one('eran.category.group', string="Category Group")
-    target = fields.Monetary(string="Target")
-    problem = fields.Char(string="Problem")
-    activity = fields.Char(string="Activity")
-
-class EranLossSalesOpportunity(models.Model):
-    _name = 'master.loss.sales.opportunity'
-
-    date = fields.Date(string="Date", default=fields.Date.today())
-    currency_id = fields.Many2one('res.currency', string="Currency", default=lambda self: self.env.company.currency_id)
     category_group_id = fields.Many2one('eran.category.group', string="Category Group")
     target = fields.Monetary(string="Target")
     problem = fields.Char(string="Problem")

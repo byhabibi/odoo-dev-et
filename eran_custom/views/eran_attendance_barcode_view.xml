@@ -79,7 +79,16 @@
         <field name="view_mode">kanban,tree,form</field>
     </record>
 
-    <menuitem id="menu_mes_scan_root" name="MES Scan"/>
-    <menuitem id="menu_mes_scan_approval" parent="menu_mes_scan_root" action="action_mes_scan_approval" name="Approval"/>
+    <record id="action_mes_kiosk_mode" model="ir.actions.client">
+        <field name="name">MES Kiosk</field>
+        <field name="tag">mes_kiosk_mode</field>
+    </record>
+
+    <menuitem
+        id="menu_mes_kiosk"
+        parent="dsn_approval_mrp.menu_item_dsn_approval_setting_mrp"
+        action="action_mes_kiosk_mode"
+        name="MO Scan"
+        sequence="20"/>
 
 </odoo>

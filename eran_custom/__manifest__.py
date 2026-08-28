@@ -49,6 +49,9 @@
         'data/eran_action_menu.xml',
         'data/eran_rule.xml',
         'data/eran_pica_sequence.xml',
+        'data/eran_mrp_production_loss.xml',
+
+
         
         #views
         'views/res_company_views.xml',
@@ -91,6 +94,7 @@
         'views/eran_account_asset_view.xml',
         'views/eran_attendance_view.xml',
         'views/eran_attendance_barcode_view.xml',
+        'views/eran_edit_request_view.xml',
 
         #wizard
         'wizard/eran_quotation_loi_wiz_view.xml',
@@ -104,8 +108,7 @@
         'wizard/eran_delivery_schedule_view.xml',
         'wizard/eran_sale_invoice_advance_wiz_view.xml',
         'wizard/eran_purchase_order_advance_payment_wiz_view.xml',
-
-        'views/eran_menu_views.xml', #<<--- letakan selalu paling bawah
+        'views/eran_menu_views.xml', 
     ],
     'depends': ['base', 'account', 'stock', 'purchase', 'sale', 'quality', 'quality_control', 'purchase_request', 'barcodes', 'stock_barcode', 
         'mrp_account_enterprise', 'dsn_approval_purchase', 'dsn_sequence_setting', 'product', 'hr', 'invoice_from_picking', 'mrp',
@@ -119,7 +122,11 @@
     'assets': {
         'web.assets_backend': [
            'eran_custom/static/src/**/*',
-        ]
+           'eran_custom/static/src/js/greeting_message_patch.js',
+           'eran_custom/static/src/js/mes_kiosk_mode.js',
+           'eran_custom/static/src/js/mes_edit_request_notification.js',
+           'eran_custom/static/src/js/mes_edit_request.js',
+        ],
     }
 
 }

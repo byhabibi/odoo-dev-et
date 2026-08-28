@@ -457,18 +457,12 @@
           parent="eran_custom.sale_dashboard_id"
           action="eran_custom.action_master_loss_opportunity"
           sequence="1"/>
-
-    <menuitem id="master_loss_sales_opportunity_menu"
-          name="Loss Sales Opportunity"
-          parent="eran_custom.sale_dashboard_id"
-          action="eran_custom.action_master_loss_sales_opportunity"
-          sequence="2"/>
     
     <menuitem id="master_vendor_performance_customer_menu"
           name="Vendor Performance by Customer"
           parent="eran_custom.sale_dashboard_id"
           action="eran_custom.action_master_vendor_performance_customer"
-          sequence="3"/>
+          sequence="2"/>
 
     
     <menuitem id="inventory_dashboard_id"

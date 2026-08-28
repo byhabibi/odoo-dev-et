@@ -63,13 +63,7 @@ class EranAttendanceMachineConfig(models.Model):
         user_tz = pytz.timezone(self.env.user.tz or 'Asia/Jakarta')
         utc_tz = pytz.utc
         """ Fungsi untuk mendownload data log dari mesin X902 dan simpan ke model log transaksi """
-        # SOLUSI UTAMA: Jika self kosong (karena dipanggil cron), cari semua mesin yang aktif
-        records_to_process = self
-        if not records_to_process:
-            # Ganti 'state' atau field aktif sesuai field di model Anda (contoh: mengambil semua mesin)
-            records_to_process = self.env['eran.attendance.machine.config'].search([]) 
-            _logger.info("Cron mendeteksi self kosong. Memproses %s mesin ditemukan.", len(records_to_process))
-        for record in records_to_process:
+        for record in self:
             if record.connection_status != 'online':
                 raise UserError(_("Mesin tidak dalam status online. Mohon tes koneksi terlebih dahulu!"))
             
@@ -190,7 +184,7 @@ class eranAttendance(models.Model):
     _inherit = 'hr.attendance'
 
     # Tambahan field untuk menyimpan info shift (optional)
-    shift_id = fields.Many2one('eran.master.shift', string="Shift", readonly=True, compute="_compute_shift_id", store=True)
+    shift_id = fields.Many2one('eran.master.shift', string="Shift", readonly=True)
     overtime_id = fields.Many2one(
         'eran.hr.overtime', 
         string="Overtime", 
@@ -200,25 +194,6 @@ class eranAttendance(models.Model):
     checkout_lembur = fields.Datetime('Lembur Sampai')
     istirahat_lembur = fields.Float('Istirahat Lembur (Jam)')
     total_lembur = fields.Float('Total Lembur (Jam)', compute='_compute_total_lembur', store=True)
-
-    @api.depends('check_in','check_out','employee_id')
-    def _compute_shift_id(self):
-        local_tz = pytz.timezone('Asia/Jakarta')
-        utc_tz = pytz.utc
-
-        for rec in self:
-            if rec.shift_id:
-                continue  # Jika shift_id sudah ada, lewati perhitungan
-
-            if rec.check_in and rec.check_out and rec.employee_id:
-                # Konversi check_in ke waktu lokal Jakarta
-                utc_check_in = utc_tz.localize(rec.check_in)
-                local_check_in = utc_check_in.astimezone(local_tz)
-                local_date = local_check_in.date()
-
-                
-            else:
-                rec.shift_id = False
 
     def float_to_time(self, float_hours):
         if not float_hours:
@@ -239,7 +214,7 @@ class eranAttendance(models.Model):
 
         for log in logs:
             # Peta karyawan berdasarkan PIN mesin
-            if log.user_id == 53 or log.user_id == 22 or log.user_id == 21 or log.user_id == 89 or log.user_id == 124 or log.user_id == 23 or log.user_id == 25:
+            if log.user_id == 50:
                 if not log.employee_id:
                     employee = self.env['hr.employee'].search([('pin', '=', str(log.user_id))], limit=1)
                     if employee:
@@ -293,22 +268,7 @@ class eranAttendance(models.Model):
                                         ('state', '=', 'published')
                                     ], limit=1, order='start_datetime asc')
                         if not planning_slot:
-                            # 2. Buat range pencarian start dan end of day (00:00:00 sampai 23:59:59 waktu lokal)
-                            # Lalu bersihkan timezone-nya (.replace(tzinfo=None)) agar siap masuk ke query Odoo
-                            start_of_day_local = datetime.combine(local_date, datetime.min.time())
-                            end_of_day_local = datetime.combine(local_date, datetime.max.time())
-
-                            # Konversi balik range lokal tadi ke UTC untuk dicocokkan ke database planning.slot
-                            start_of_day_utc = local_tz.localize(start_of_day_local).astimezone(utc_tz).replace(tzinfo=None)
-                            end_of_day_utc = local_tz.localize(end_of_day_local).astimezone(utc_tz).replace(tzinfo=None)
-                            planning_slot = self.env['planning.slot'].search([
-                                                ('employee_id', '=', employee.id),
-                                                ('start_datetime', '>=', start_of_day_utc),
-                                                ('start_datetime', '<=', end_of_day_utc),
-                                                ('state', '=', 'published')
-                                            ], limit=1, order='start_datetime asc')
-                            if not planning_slot:
-                                continue
+                            continue
 
                     shift = planning_slot.shift_id
                     if shift:
@@ -467,7 +427,6 @@ class eranAttendance(models.Model):
                 rec.total_lembur = 0
   
 
-
 class eranAttendanceLog(models.Model):
     _name = 'eran.attendance.log.transaction'
     _description = 'Log Transaksi Absen Mesin'
@@ -509,17 +468,6 @@ class eranplanningSlot(models.Model):
                 shift = self.env['eran.master.shift'].search([('start_time', '=', time_start_planning), ('end_time', '=', time_end_planning)], limit=1)
                 slot.shift_id = shift.id if shift else False
 
-    @api.depends('state', 'role_id.color', 'resource_id.color')
-    def _compute_color(self):
-        for slot in self:
-            if slot.state == 'draft':
-                slot.color = 8  # indeks warna Silver / Abu-abu bawaan Odoo
-            elif slot.state == 'published':
-                slot.color = 5  # indeks warna Hijau bawaan Odoo
-            else:
-                # Jika statusnya di luar draft/publish, jalankan logika asli bawaan Odoo
-                slot.color = slot.role_id.color or slot.resource_id.color
-                
 class eranAttendanceOvertime(models.Model):
     _name = 'eran.hr.overtime'
     _description = 'attendance overtime'
@@ -691,71 +639,64 @@ class eranAttendanceOvertime(models.Model):
         else:
             self.user_in_assigned_to = False
 
-
     def _compute_to_attendance(self):
-        """ Fungsi ini dipanggil dari btn_approved saat status berubah jadi 'done' """
-        # Ambil timezone user atau default Asia/Jakarta
-        user_tz = self.env.user.tz or 'Asia/Jakarta'
-        local_tz = pytz.timezone(user_tz)
-
         for rec in self:
-            # Karena dipanggil di dalam btn_approved setelah write state='done', 
-            # kondisi rec.state == 'done' sudah pasti terpenuhi.
-            if rec.attendance_overtime_line:
+            if rec.state == 'done' and rec.attendance_overtime_line:
                 
                 for line in rec.attendance_overtime_line:
+                    
                     # Validasi kelengkapan data sebelum diproses
-                    if not line.tanggal_pengajuan or line.start_actual is False or line.finish_actual is False:
+                    if not line.tanggal_pengajuan or not line.start_actual or not line.finish_actual:
                         continue
 
-                    # --- 1. AMBIL RENTANG WAKTU LOKAL (AWAL & AKHIR HARI) ---
-                    # Gabungkan tanggal dengan jam minimal (00:00:00) dan maksimal (23:59:59)
-                    dt_start_local = datetime.combine(line.tanggal_pengajuan, datetime.min.time())
-                    dt_end_local = datetime.combine(line.tanggal_pengajuan, datetime.max.time())
+                    # 1. Format string tanggal untuk kueri SQL
+                    # Menghasilkan teks: '2026-06-17 00:00:00' dan '2026-06-17 23:59:59'
+                    str_tanggal = line.tanggal_pengajuan.strftime('%Y-%m-%d')
+                    sql_mindate = f"{str_tanggal} 00:00:00.000"
+                    sql_maxdate = f"{str_tanggal} 23:59:59.000"
 
-                    # Konversi rentang waktu lokal tersebut ke UTC untuk kueri ORM
-                    dt_start_utc = local_tz.localize(dt_start_local).astimezone(pytz.utc).replace(tzinfo=None)
-                    dt_end_utc = local_tz.localize(dt_end_local).astimezone(pytz.utc).replace(tzinfo=None)
+                    # 2. Jalankan Kueri SQL murni seperti yang Anda coba di database
+                    query = """
+                        SELECT id 
+                        FROM hr_attendance 
+                        WHERE employee_id = %s
+                        AND check_in >= %s 
+                        AND check_in <= %s
+                        LIMIT 1;
+                    """
+                    self.env.cr.execute(query, (line.employee_id.id, sql_mindate, sql_maxdate))
+                    res = self.env.cr.fetchone()  # Mengambil hasil kueri (berupa tuple)
 
-                    # --- 2. CARI ATTENDANCE MENGGUNAKAN ORM ODOO ---
-                    # Menggunakan ORM dengan nilai datetime UTC hasil konversi tadi
-                    attendance = self.env['hr.attendance'].search([
-                        ('employee_id', '=', line.employee_id.id),
-                        ('check_in', '>=', fields.Datetime.to_string(dt_start_utc)),
-                        ('check_in', '<=', fields.Datetime.to_string(dt_end_utc))
-                    ], limit=1)
+                    # 3. Jika ID absensi ditemukan, lakukan proses pembaruan data
+                    if res and res[0]:
+                        attendance_id = res[0]
+                        # Ambil browse record dari ID tersebut agar bisa di-write
+                        attendance_date = self.env['hr.attendance'].browse(attendance_id)
 
-                    # --- 3. PROSES DATA JIKA ABSENSI DITEMUKAN ---
-                    if attendance:
                         # Konversi jam float untuk kebutuhan write datetime di Odoo
                         start_hours, start_minutes = divmod(line.start_actual * 60, 60)
                         finish_hours, finish_minutes = divmod(line.finish_actual * 60, 60)
 
-                        # Buat datetime lokal awal berdasarkan input jam float lembur
-                        dt_checkin_local = datetime.combine(line.tanggal_pengajuan, datetime.min.time()) + timedelta(hours=int(start_hours), minutes=int(start_minutes))
-                        dt_checkout_local = datetime.combine(line.tanggal_pengajuan, datetime.min.time()) + timedelta(hours=int(finish_hours), minutes=int(finish_minutes))
+                        dt_checkin = datetime.combine(line.tanggal_pengajuan, datetime.min.time()) + timedelta(hours=int(start_hours), minutes=int(start_minutes))
+                        dt_checkout = datetime.combine(line.tanggal_pengajuan, datetime.min.time()) + timedelta(hours=int(finish_hours), minutes=int(finish_minutes))
 
-                        # Handle jika jam lembur selesai melewati tengah malam (keesokan harinya)
                         if line.finish_actual < line.start_actual:
-                            dt_checkout_local += timedelta(days=1)
-
-                        # Konversi hasil akhir jam lembur lokal ke UTC sebelum di-write ke database
-                        dt_checkin_utc = local_tz.localize(dt_checkin_local).astimezone(pytz.utc).replace(tzinfo=None)
-                        dt_checkout_utc = local_tz.localize(dt_checkout_local).astimezone(pytz.utc).replace(tzinfo=None)
+                            dt_checkout += timedelta(days=1)
 
                         # Tulis data lembur ke record absensi yang ditemukan
-                        attendance.write({
+                        attendance_date.write({
                             'overtime_id': rec.id,
-                            'checkin_lembur': dt_checkin_utc,
-                            'checkout_lembur': dt_checkout_utc,
+                            'checkin_lembur': dt_checkin,
+                            'checkout_lembur': dt_checkout,
                             'istirahat_lembur': line.istirahat_actual,
+                            'total_lembur': line.durasi_actual
                         })
 
                     else:
-                        # Jika absensi tidak ditemukan, munculkan pesan error agar transaksi tidak menggantung
-                        raise ValidationError(_("Gagal memproses lembur! Data absensi untuk karyawan %s pada tanggal %s tidak ditemukan di sistem.") % (line.employee_id.name, line.tanggal_pengajuan))
+                        # Jika absensi tidak ditemukan, tandai dokumen atau field log Anda
+                        raise ValidationError(_("failed to send attendance!"))
             else:
-                raise ValidationError(_("Gagal memproses! Dokumen overtime tidak memiliki baris data (lines)."))
+                raise ValidationError(_("failed to send attendance!"))
 
 class EranAttendanceOvertimeApprovalLine(models.Model):
     _name = 'eran.attendance.overtime.approval.line'
@@ -810,145 +751,3 @@ class eranAttendanceOvertimeLine(models.Model):
                 rec.durasi_actual = 0
 
 
-class HrEmployee(models.Model):
-    _inherit = "hr.employee"
-
-    @api.model
-    def attendance_scan(self, barcode):
-
-        _logger.warning("========== BARCODE SCAN ==========")
-        _logger.warning("Barcode : %s", barcode)
-        _logger.warning("==================================")
-
-
-        # ===================================
-        # Cari Employee
-        # ===================================
-        employee = self.sudo().search([
-            ("barcode", "=", barcode)
-        ], limit=1)
-
-        if not employee:
-            _logger.warning("Employee tidak ditemukan")
-            return super().attendance_scan(barcode)
-
-        _logger.warning("Employee : %s", employee.name)
-        _logger.warning("Employee ID : %s", employee.id)
-
-        # ===================================
-        # Jalankan Attendance bawaan Odoo
-        # ===================================
-        result = super().attendance_scan(barcode)
-
-        # ===================================
-        # Attendance terbaru
-        # ===================================
-        attendance = self.env["hr.attendance"].sudo().search([
-            ("employee_id", "=", employee.id)
-        ], order="id desc", limit=1)
-
-        if not attendance:
-            _logger.warning("Attendance tidak ditemukan")
-            return result
-
-        today = attendance.check_in.replace(hour=0, minute=0, second=0, microsecond=0)
-        tomorrow = today + timedelta(days=1)
-
-        _logger.warning("================ DATE FILTER ================")
-        _logger.warning("Check In : %s", attendance.check_in)
-        _logger.warning("Today    : %s", today)
-        _logger.warning("Tomorrow : %s", tomorrow)
-        _logger.warning("============================================")
-
-        # ===================================
-        # Cari Work Order: OPERATOR + TANGGAL saja
-        # ===================================
-        domain = [
-            ("operator_id", "=", employee.id),
-            ("state", "in", ["pending", "waiting", "ready", "progress", "done"]),
-            ("production_id.date_planned_start", ">=", today),
-            ("production_id.date_planned_start", "<", tomorrow),
-        ]
-
-        _logger.warning("DOMAIN WORKORDER = %s", domain)
-
-        workorders = self.env["mrp.workorder"].sudo().search(domain)
-
-        _logger.warning("TOTAL WO DITEMUKAN = %s", len(workorders))
-
-        for wo in workorders:
-            _logger.warning(
-                "WO_ID=%s | WO=%s | MO=%s | WC=%s | STATE=%s",
-                wo.id,
-                wo.name,
-                wo.production_id.name,
-                wo.workcenter_id.name,
-                wo.state
-            )
-
-        if not workorders:
-            _logger.warning("Tidak ada Work Order yang cocok untuk employee ini hari ini")
-            return result
-
-        # ===================================
-        # Buat Approval + Lines
-        # ===================================
-        approval = self.env["mes.scan.approval"].sudo().create({
-            "employee_id": employee.id,
-            "check_in": attendance.check_in,
-            "scan_time": fields.Datetime.now(),
-            "shift_id": workorders[:1].shift_id.id,
-            "workcenter_id": workorders[:1].workcenter_id.id,
-            "state": "ready",
-        })
-
-        _logger.warning("APPROVAL ID = %s", approval.id)
-
-        STATE_MAP = {
-            "pending": "ready",
-            "waiting": "ready",
-            "ready": "ready",
-            "progress": "running",
-            "done": "done",
-        }
-
-        for seq, wo in enumerate(workorders, start=1):
-
-            line = self.env["mes.scan.approval.line"].sudo().create({
-                "approval_id": approval.id,
-                "sequence": seq,
-                "workorder_id": wo.id,
-                "qty_target": wo.production_id.product_qty,
-                "qty_actual": 0,
-                "state": STATE_MAP.get(wo.state, "ready"),
-            })
-
-            _logger.warning("LINE %s CREATED, ID = %s | WO = %s | STATE = %s", seq, line.id, wo.name, line.state)
-
-        _logger.warning("FINISH CREATE APPROVAL")
-
-        return result
-    
-class MrpWorkorder(models.Model):
-    _inherit = "mrp.workorder"
-
-    # Field tambahan untuk ditampilkan di tabel Work Order
-    employee_id = fields.Many2one('hr.employee', string="Operator")
-    shift_id = fields.Many2one('eran.master.shift', string="Shift")
-
-    def button_start(self):
-        # 1. Jalankan fungsi standar Odoo
-        res = super(MrpWorkorder, self).button_start()
-        
-        # 2. Ambil data scan approval terbaru yang statusnya 'approved'
-        last_scan = self.env['mes.scan.approval'].search([
-            ('state', '=', 'approved')
-        ], order='scan_time desc', limit=1)
-        
-        # 3. Otomatis isi ke Work Order saat tombol start diklik
-        if last_scan:
-            self.write({
-                'employee_id': last_scan.employee_id.id,
-                'shift_id': last_scan.shift_id.id
-            })
-        return res

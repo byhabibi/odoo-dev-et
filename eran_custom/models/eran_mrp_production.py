@@ -7,6 +7,15 @@ _logger = logging.getLogger(__name__)
 class MrpProduction(models.Model):
     _inherit = "mrp.production"
 
+    def write(self, vals):
+        res = super().write(vals)
+        if "operator_id" in vals:
+            for production in self:
+                production.workorder_ids.write({
+                    "operator_id": production.operator_id.id
+                })
+        return res
+
 
     qty_plan = fields.Float('Qty Daily Pattern')
     qty_keppin = fields.Float('Qty Keppin', compute='_compute_qty_keppin', store=True)

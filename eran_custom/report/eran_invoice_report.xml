@@ -389,9 +389,7 @@
                             <tbody style="border: 0;">
                                 <tr>
                                     <td class="text-center"><span t-field="o.payment_reference"/></td>
-                                    <td class="text-center">
-                                        <span t-options="{&quot;widget&quot;: &quot;date&quot;, &quot;format&quot;: &quot;dd MMM yyyy&quot;}" t-esc="o.invoice_exchange_date"/>
-                                    </td>
+                                    <td class="text-center"><span t-esc="o.invoice_exchange_date.strftime('%d %b %Y')" /></td>
                                     <td style="text-align:right !important;"><span t-field="o.amount_total"/></td>
                                 </tr>
                                 <tr style="border: 0;">
@@ -402,7 +400,7 @@
                                 <tr style="border: 0;">
                                     <td style="border:0;">Jatuh Tempo Pembayaran Tgl:</td>
                                     <td style="border:0;"></td>
-                                    <td style="border:0;">Bogor, <span t-options="{&quot;widget&quot;: &quot;date&quot;, &quot;format&quot;: &quot;dd MMM yyyy&quot;}" t-esc="o.invoice_exchange_date"/> </td>
+                                    <td style="border:0;">Bogor, <span t-esc="o.invoice_exchange_date.strftime('%d %b %Y')" /> </td>
                                 </tr>
                                 <tr style="border: 0;">
                                     <td style="border:0;" colspan="3"></td>

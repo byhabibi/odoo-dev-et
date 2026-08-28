@@ -54,7 +54,6 @@
 "access_dsn_mps_bu_line","access_dsn_mps_bu_line","model_eran_tag_sto_line","base.group_user",1,1,1,1
 "access_stock_valuation_layer","access_stock_valuation_layer","model_stock_valuation_layer","stock.group_stock_manager",1,1,1,0
 "access_master_loss_opportunity","access_master_loss_opportunity","model_master_loss_opportunity","base.group_user",1,1,1,1
-"access_master_loss_sales_opportunity","access_master_loss_sales_opportunity","model_master_loss_sales_opportunity","base.group_user",1,1,1,1
 "access_master_vendor_performance_customer","access_master_vendor_performance_customer","model_master_vendor_performance_customer","base.group_user",1,1,1,1
 "access_master_delivery_achivement_rate","access_master_delivery_achivement_rate","model_master_delivery_achivement_rate","base.group_user",1,1,1,1
 "access_master_production_achivement_rate","access_master_production_achivement_rate","model_master_production_achivement_rate","base.group_user",1,1,1,1
@@ -77,12 +76,17 @@
 "access_eran_attendance_overtime_approval_line","eran_attendance_overtime_approval_line","model_eran_attendance_overtime_approval_line","dsn_approval.group_approval_user",1,1,1,1
 "access_eran_rekap_absen_report_detail","eran_rekap_absen_report_detail","model_eran_rekap_absen_report_detail","",1,1,1,1
 "access_eran_rekap_absen_report_global","eran_rekap_absen_report_global","model_eran_rekap_absen_report_global","base.group_user",1,1,1,1
-"access_eran_mrp_workcenter_employee","eran_mrp_workcenter_employee","model_eran_mrp_workcenter_employee","base.group_system",1,1,1,1
-"access_mes_scan_approval","mes_scan_approval","model_mes_scan_approval","base.group_system",1,1,1,1
-"access_barcode_scan_log","barcode_scan_log","model_barcode_scan_log","base.group_system",1,1,1,1
-"access_mes_scan_approval_line","mes_scan_approval_line","model_mes_scan_approval_line","base.group_user",1,1,1,1
-"access_mes_scan_approval_line_downtime","mes_scan_approval_line_downtime","model_mes_scan_approval_line_downtime","base.group_user",1,1,1,1
-
-
+"access_eran_mrp_workcenter_employee_admin","eran_mrp_workcenter_employee_admin","model_eran_mrp_workcenter_employee","base.group_system",1,1,1,1
+"access_mes_scan_approval_admin","mes_scan_approval_admin","model_mes_scan_approval","base.group_system",1,1,1,1
+"access_barcode_scan_log_admin","barcode_scan_log_admin","model_barcode_scan_log","base.group_system",1,1,1,1
+"access_mes_scan_approval_line_user","mes_scan_approval_line_user","model_mes_scan_approval_line","base.group_user",1,1,1,1
+"access_mes_scan_approval_line_downtime_user","mes_scan_approval_line_downtime_user","model_mes_scan_approval_line_downtime","base.group_user",1,1,1,1
+"access_mes_scan_approval_edit_request_admin","mes_scan_approval_edit_request_admin","model_mes_scan_approval_edit_request","base.group_system",1,1,1,1
+"access_mes_scan_approval_user","mes_scan_approval_user","model_mes_scan_approval","base.group_user",1,1,1,1
+"access_mes_scan_approval_user","mes_scan_approval_user","model_mes_scan_approval","base.group_user",1,0,0,0
+"access_mes_scan_approval_line_user","mes_scan_approval_line_user","model_mes_scan_approval_line","base.group_user",1,1,0,0
+"access_mes_scan_approval_line_downtime_user","mes_scan_approval_line_downtime_user","model_mes_scan_approval_line_downtime","base.group_user",1,1,0,0
+"access_mes_scan_approval_edit_request_user","mes_scan_approval_edit_request_user","model_mes_scan_approval_edit_request","base.group_user",1,1,0,0
+"access_mes_scan_approval_edit_request_admin","mes_scan_approval_edit_request_admin","model_mes_scan_approval_edit_request","base.group_system",1,1,1,1
 
 

@@ -407,7 +407,14 @@ class MroProduction(models.Model):
                 if move_finished:
                     move_finished.unlink()
 
-            if this.good_total <= 0 and this.picking_type_id.active == True:
+        if this.good_total <= 0 and this.picking_type_id.active == True:
+            raise ValidationError(_('Good total cannot be null or minus'))
+
+            if (
+                this.good_total <= 0
+                and this.picking_type_id.active == True
+                and not self.env.context.get('skip_good_total_check')
+            ):
                 raise ValidationError(_('Good total cannot be null or minus'))
             if this.picking_type_id:
                 if not this.picking_type_id.ng_location_id and this.ng_total > 0 and this.picking_type_id.active == True:
@@ -937,7 +944,11 @@ class EranWorkOrder(models.Model):
         user_tz = pytz.timezone(self.env.user.tz or 'UTC')
         now_utc = datetime.now(user_tz) # Waktu sekarang dalam UTC untuk database
         end_local = now_utc.astimezone(pytz.utc).replace(tzinfo=None)
-        if self.production_id and self.production_id.good_total <= 0:
+        if (
+            self.production_id
+            and self.production_id.good_total <= 0
+            and not self.env.context.get('skip_good_total_check')
+        ):
             raise ValidationError(_('Good total cannot be null or minus'))
         for record in self:
 
